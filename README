@@ -1,0 +1,34 @@
+
+About
+-----
+
+umph is a command line tool for parsing Youtube playlists. It was written
+to be used with cclive.
+
+Installation
+------------
+
+Note that installation is *optional*. You can just as well copy the
+bin/umph file manually to your path and start using it. The Makefile.PL
+(and friends) exist primarily to ease the distribution process of umph.
+
+* See Makefile.PL for prerequisites
+
+* Make sure you remove any earlier versions of umph before you continue
+
+* INSTALL_BASE can be passed into Makefile.PL to change where clive will
+be installed. For example:
+
+    perl Makefile.PL INSTALL_BASE=/usr/local
+
+Typical installation:
+
+perl Makefile.PL
+make
+make test # optional step
+make install
+
+For ExtUtils::MakeMaker documentation, see:
+  http://search.cpan.org/perldoc?ExtUtils::MakeMaker
+
+

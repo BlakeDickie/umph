@@ -1,0 +1,224 @@
+#!/usr/bin/perl
+# -*- coding: ascii -*-
+
+#
+# Copyright (C) 2010 Toni Gundogdu <legatvs@gmail.com>.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#
+
+use warnings;
+use strict;
+
+binmode( STDOUT, ":utf8" );
+binmode( STDERR, ":utf8" );
+
+use Getopt::ArgvFile( home => 1, startupFilename => [qw(.umphrc)] );
+use Getopt::Long qw(:config bundling);
+
+my $VERSION = "0.1.0";
+my %config;
+
+init();
+main();
+exit 0;
+
+sub init {
+    GetOptions(
+        \%config,
+        'interactive|i',
+        'version|v' => \&print_version,
+        'help|h'    => \&print_help,
+    ) or exit(1);
+}
+
+sub print_version {
+    print "
+umph $VERSION. Copyright (C) 2010 Toni Gundogdu. License: GNU GPL version 3
+or later This is free software; see the source for copying conditions. There
+is NO warranty;  not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR
+PURPOSE.
+";
+    exit(0);
+}
+
+sub print_help {
+    require Pod::Usage;
+    Pod::Usage::pod2usage( -exitstatus => 0, -verbose => 1 );
+}
+
+sub main {
+
+    print_help if scalar @ARGV == 0;
+
+    my $req_body = "http://gdata.youtube.com/feeds/api/playlists/";
+
+    my $url = $ARGV[0];
+
+    if ( $url =~ /^http:/i ) {
+        # Looks like an URL.
+        if ( $url =~ /view_play_list\?p=(.*?)$/i ) {
+            $url = "$req_body$1";
+        }
+    }
+    else {
+
+        # Assume playlist id.
+        $url = "$req_body$url";
+    }
+    $url .= "?v=2";
+
+    require XML::DOM;
+
+    my $p    = new XML::DOM::Parser;
+    my $doc  = $p->parsefile($url);
+    my $root = $doc->getDocumentElement;
+    my $all  = 0;
+    my $skip = 0;
+
+    my @lst;
+    for my $entry ( $root->getElementsByTagName("entry") ) {
+
+        my $title =
+            to_item( $entry, "title" )->getFirstChild->getNodeValue;
+
+        my $link =
+            to_item( $entry, "link" )->getAttributeNode("href")->getValue;
+
+        if ( $config{interactive} ) {
+            last if $skip;
+            my $r
+                = $all
+                ? "a"
+                : prompt("$title\n  $link\nDownload this video?");
+            exit 0 if $r eq "q";
+            $all  ||= $r eq "a";
+            $skip ||= $r eq "s";
+            push @lst, $link if $r eq "y" || $all;
+        }
+        else {
+            push @lst, $link;
+        }
+    }
+
+    $doc->dispose;
+
+    print "$_\n" foreach @lst;
+
+}
+
+sub to_item {
+    my ( $entry, $name ) = @_;
+    return $entry->getElementsByTagName($name)->item(0);
+}
+
+sub prompt {
+    my ($q) = @_;
+    while (1) {
+        print STDERR "$q (Yes/No/All remaining/Skip remaining/Quit): ";
+        my $ln = <STDIN>;
+        next if !$ln;
+        chomp $ln;
+        return lc $1 if $ln =~ /(y|n|a|s|q)/i;
+    }
+}
+
+__END__
+
+=head1 NAME
+
+umph - command line playlist parser for cclive (and alike)
+
+=head1 SYNOPSIS
+
+umph [options] [URL|PLAYLIST_ID]
+
+=head1 DESCRIPTION
+
+umph is a command line playlist parser for c/clive and similar
+video download tools.
+
+=head1 OPTIONS
+
+ -h, --help             print help and exit
+ -v, --version          print version and exit
+ -i, --interactive      be interactive, default is no
+
+=head1 OPTIONS DESCRIPTIONS
+
+=over 4
+
+=item B<-h, --help>
+
+Print help and exit.
+
+=item B<-v, --version>
+
+Print version and exit.
+
+=item B<-i, --interactive>
+
+Be interactive, default is no. Implies prompting, or selecting videos.
+
+=back
+
+=head1 EXAMPLES
+
+=over 4
+
+=item umph "http://www.youtube.com/view_play_list?p=AAF3A1D0CA1E304F"
+
+=item umph "http://gdata.youtube.com/feeds/api/playlists/AAF3A1D0CA1E304F?v=2" 
+
+=item umph AAF3A1D0CA1E304F
+
+All of the three above do the same.
+
+=item umph AAF3A1D0CA1E304F | cclive -f mp4
+
+Passes the parsed video links to cclive.
+
+=back
+
+=head1 EXIT STATUS
+
+Exits 0 on success, otherwise 1.
+
+=head1 FILES
+
+=over 4
+
+=item $HOME/.umphrc, for example:
+
+echo "--interactive" >> ~/.umphrc
+
+=back
+
+=head1 OTHER
+
+umph depends on XML::DOM which uses LWP::UserAgent to retrieve
+the playlist data. Note that LWP::UserAgent reads http_proxy
+environment setting.
+
+=head1 SEE ALSO
+
+C<cclive(1)> C<clive(1)>
+
+=head1 AUTHOR
+
+Toni Gundogdu <legatvs@gmail.com>
+
+=cut
+
+
