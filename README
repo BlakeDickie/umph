@@ -2,8 +2,16 @@
 About
 -----
 
-umph is a command line tool for parsing Youtube playlists. It was written
-to be used with cclive.
+umph is a command line tool for parsing Youtube playlists.
+It was written to be used with cclive but other tools may
+use it also.
+
+Project:
+  http://umph.googlecode.com/
+
+Development repository:
+  git clone git://repo.or.cz/umph.git
+
 
 Installation
 ------------
@@ -25,7 +33,6 @@ Typical installation:
 
 perl Makefile.PL
 make
-make test # optional step
 make install
 
 For ExtUtils::MakeMaker documentation, see:

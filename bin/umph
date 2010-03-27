@@ -138,7 +138,7 @@ __END__
 
 =head1 NAME
 
-umph - command line playlist parser for cclive (and alike)
+umph - Youtube video playlist parser for cclive and alike tools
 
 =head1 SYNOPSIS
 
@@ -146,8 +146,9 @@ umph [options] [URL|PLAYLIST_ID]
 
 =head1 DESCRIPTION
 
-umph is a command line playlist parser for c/clive and similar
-video download tools.
+umph is a command line tool for parsing Youtube playlists.
+It was written to be used with cclive but other tools may
+use it also.
 
 =head1 OPTIONS
 
@@ -210,6 +211,12 @@ echo "--interactive" >> ~/.umphrc
 umph depends on XML::DOM which uses LWP::UserAgent to retrieve
 the playlist data. Note that LWP::UserAgent reads http_proxy
 environment setting.
+
+Project:
+  http://umph.googlecode.com/
+
+Development repository:
+  git clone git://repo.or.cz/umph.git
 
 =head1 SEE ALSO
 
