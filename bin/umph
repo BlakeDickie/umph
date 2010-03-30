@@ -29,6 +29,8 @@ use Getopt::Long qw(:config bundling);
 
 my $VERSION = "0.1.0";
 my %config;
+my @entries;
+my $done = 0;
 
 init();
 main();
@@ -79,15 +81,16 @@ sub main {
     }
     $url .= "?v=2";
 
+    print STDERR "Fetch $url ...\n";
+
     require XML::DOM;
 
     my $p    = new XML::DOM::Parser;
     my $doc  = $p->parsefile($url);
     my $root = $doc->getDocumentElement;
-    my $all  = 0;
-    my $skip = 0;
 
-    my @lst;
+    print STDERR ":: Parse playlist for video entries ...\n";
+
     for my $entry ( $root->getElementsByTagName("entry") ) {
 
         my $title =
@@ -96,26 +99,19 @@ sub main {
         my $link =
             to_item( $entry, "link" )->getAttributeNode("href")->getValue;
 
-        if ( $config{interactive} ) {
-            last if $skip;
-            my $r
-                = $all
-                ? "a"
-                : prompt("$title\n  $link\nDownload this video?");
-            exit 0 if $r eq "q";
-            $all  ||= $r eq "a";
-            $skip ||= $r eq "s";
-            push @lst, $link if $r eq "y" || $all;
-        }
-        else {
-            push @lst, $link;
-        }
+        my %data = ( title => $title, url => $link, selected => 1);
+        push @entries, \%data;
     }
 
     $doc->dispose;
 
-    print "$_\n" foreach @lst;
+    print STDERR "::: Found " .scalar @entries. " video entries\n";
 
+    prompt() if $config{interactive};
+
+    foreach (@entries) {
+        print "$_->{url}\n" if $_->{selected} || !$config{interactive};
+    }
 }
 
 sub to_item {
@@ -124,15 +120,91 @@ sub to_item {
 }
 
 sub prompt {
-    my ($q) = @_;
-    while (1) {
-        print STDERR "$q (Yes/No/All remaining/Skip remaining/Quit): ";
+    my $p    = "(umph) ";
+    my %cmds = (
+        'h' => \&help,
+        'q' => \&quit,
+        'l' => \&list,
+        'd' => \&dump,
+        'a' => \&select_all,
+        'n' => \&select_none,
+        'r' => \&revert_selection,
+    );
+    print STDERR "Enter prompt\nNote: all videos selected by default\n";
+    print STDERR "Type \"help\" to get a list of commands\n";
+    while (!$done) {
+        print STDERR $p;
         my $ln = <STDIN>;
         next if !$ln;
         chomp $ln;
-        return lc $1 if $ln =~ /(y|n|a|s|q)/i;
+        if ( $ln =~ /(\d+)/ ) {
+            toggle_number($1);
+        }
+        else {
+            next if $ln !~ /(\w)/;
+            $cmds{$1}() if defined $cmds{$1};
+        }
     }
 }
+
+sub toggle_number {
+    my $i = (shift)-1;
+    if ($i >= 0 && exists $entries[$i]) {
+        $entries[$i]->{selected} = !$entries[$i]->{selected};
+        list();
+    }
+    else {
+        printf STDERR "error: out of range\n";
+    }
+}
+
+sub help {
+    print STDERR "
+Commands:
+  help      .. this
+  list      .. display playlist entries (numbered, *=selected)
+  all       .. select all videos
+  none      .. select none
+  revert    .. revert selection
+  (number)  .. toggle (select, unselect) video, see list output
+-
+  dump      .. dump selected video urls to stdout and exit
+  quit      .. terminate program
+
+Command name abbreviations are allowed, e.g. \"a\" instead of \"all\".
+";
+}
+
+sub quit {
+    exit 0;
+}
+
+sub list {
+    my $i = 0;
+    foreach (@entries) {
+        printf STDERR "%2d: $_->{title}%s\n", ++$i, $_->{selected} ? "*":"";
+    }
+}
+
+sub dump {
+    $done = 1;
+}
+
+sub select_all {
+    $_->{selected} = 1 foreach @entries;
+    list();
+}
+
+sub select_none {
+    $_->{selected} = 0 foreach @entries;
+    list();
+}
+
+sub revert_selection {
+    $_->{selected} = !$_->{selected} foreach @entries;
+    list();
+}
+
 
 __END__
 
