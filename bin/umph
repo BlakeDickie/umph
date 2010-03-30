@@ -217,9 +217,11 @@ umph [options] [URL|PLAYLIST_ID]
 
 =head1 DESCRIPTION
 
-umph is a command line tool for parsing Youtube playlists.
-It was written to be used with cclive but other tools may
-use it also.
+umph is a command line tool for parsing Youtube playlists. It prints
+playlist video links, each separated with a newline, to the standard
+output stream, while everything else gets printed to the standard
+error stream. umph can be run with a simple interactive prompt to
+select the printed video links.
 
 =head1 OPTIONS
 
@@ -227,7 +229,7 @@ use it also.
  -v, --version          print version and exit
  -i, --interactive      be interactive, default is no
 
-=head1 OPTIONS DESCRIPTIONS
+=head1 OPTION DESCRIPTIONS
 
 =over 4
 
@@ -241,7 +243,8 @@ Print version and exit.
 
 =item B<-i, --interactive>
 
-Be interactive, default is no. Implies prompting, or selecting videos.
+Be interactive, default is no. Implies the interactive prompt which
+can be used select the printed video links.
 
 =back
 
@@ -251,11 +254,9 @@ Be interactive, default is no. Implies prompting, or selecting videos.
 
 =item umph "http://www.youtube.com/view_play_list?p=AAF3A1D0CA1E304F"
 
-=item umph "http://gdata.youtube.com/feeds/api/playlists/AAF3A1D0CA1E304F?v=2" 
-
 =item umph AAF3A1D0CA1E304F
 
-All of the three above do the same.
+Both fetch and parse the same playlist (identified as "AAF3A1D0CA1E304F").
 
 =item umph AAF3A1D0CA1E304F | cclive -f mp4
 
