@@ -47,9 +47,9 @@ sub init {
 
 sub print_version {
     print
-        "umph $VERSION. Copyright (C) 2010 Toni Gundogdu. License: GNU GPL version 3
-or later This is free software; see the source for copying conditions. There
-is NO warranty;  not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR
+"umph version $VERSION. Copyright (C) 2010 Toni Gundogdu. GNU GPL v3+.
+This is free software; see the source for copying conditions. There is
+NO warranty;  not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.
 ";
     exit(0);
