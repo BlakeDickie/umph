@@ -46,8 +46,8 @@ sub init {
 }
 
 sub print_version {
-print
-"umph $VERSION. Copyright (C) 2010 Toni Gundogdu. License: GNU GPL version 3
+    print
+        "umph $VERSION. Copyright (C) 2010 Toni Gundogdu. License: GNU GPL version 3
 or later This is free software; see the source for copying conditions. There
 is NO warranty;  not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.
@@ -69,6 +69,7 @@ sub main {
     my $url = $ARGV[0];
 
     if ( $url =~ /^http:/i ) {
+
         # Looks like an URL.
         if ( $url =~ /view_play_list\?p=(.*?)$/i ) {
             $url = "$req_body$1";
@@ -93,19 +94,18 @@ sub main {
 
     for my $entry ( $root->getElementsByTagName("entry") ) {
 
-        my $title =
-            to_item( $entry, "title" )->getFirstChild->getNodeValue;
+        my $title = to_item( $entry, "title" )->getFirstChild->getNodeValue;
 
-        my $link =
-            to_item( $entry, "link" )->getAttributeNode("href")->getValue;
+        my $link
+            = to_item( $entry, "link" )->getAttributeNode("href")->getValue;
 
-        my %data = ( title => $title, url => $link, selected => 1);
+        my %data = ( title => $title, url => $link, selected => 1 );
         push @entries, \%data;
     }
 
     $doc->dispose;
 
-    print STDERR "::: Found " .scalar @entries. " video entries\n";
+    print STDERR "::: Found " . scalar @entries . " video entries\n";
 
     prompt() if $config{interactive};
 
@@ -132,7 +132,7 @@ sub prompt {
     );
     print STDERR "Enter prompt\nNote: all videos selected by default\n";
     print STDERR "Type \"help\" to get a list of commands\n";
-    while (!$done) {
+    while ( !$done ) {
         print STDERR $p;
         my $ln = <STDIN>;
         next if !$ln;
@@ -148,8 +148,8 @@ sub prompt {
 }
 
 sub toggle_number {
-    my $i = (shift)-1;
-    if ($i >= 0 && exists $entries[$i]) {
+    my $i = (shift) - 1;
+    if ( $i >= 0 && exists $entries[$i] ) {
         $entries[$i]->{selected} = !$entries[$i]->{selected};
         list();
     }
@@ -182,7 +182,7 @@ sub quit {
 sub list {
     my $i = 0;
     foreach (@entries) {
-        printf STDERR "%2d: $_->{title}%s\n", ++$i, $_->{selected} ? "*":"";
+        printf STDERR "%2d: $_->{title}%s\n", ++$i, $_->{selected} ? "*" : "";
     }
 }
 
@@ -204,7 +204,6 @@ sub revert_selection {
     $_->{selected} = !$_->{selected} foreach @entries;
     list();
 }
-
 
 __END__
 
