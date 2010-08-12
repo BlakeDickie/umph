@@ -256,7 +256,7 @@ can be used select the printed video links.
 
 Both fetch and parse the same playlist (identified as "AAF3A1D0CA1E304F").
 
-=item umph AAF3A1D0CA1E304F | cclive -f mp4
+=item umph AAF3A1D0CA1E304F | cclive -f sd_270p
 
 Passes the parsed video links to cclive.
 
