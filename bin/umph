@@ -41,18 +41,23 @@ sub init {
         \%config,
         'interactive|i',
         'version|v' => \&print_version,
+        'license'   => \&print_license,
         'help|h'    => \&print_help,
     ) or exit(1);
 }
 
 sub print_version {
+    print "umph version $VERSION\n";
+    exit 0;
+}
+
+sub print_license {
     print
-        "umph version $VERSION. Copyright (C) 2010 Toni Gundogdu. GNU GPL v3+.
-This is free software; see the source for copying conditions. There is
-NO warranty;  not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR
-PURPOSE.
+"Copyright (C) 2010 Toni Gundogdu. GNU GPL v3+. This is free software;
+see the source for copying conditions. There is NO warranty; not even
+for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 ";
-    exit(0);
+    exit 0;
 }
 
 sub print_help {
@@ -225,6 +230,7 @@ select the printed video links.
 
  -h, --help             print help and exit
  -v, --version          print version and exit
+     --license          print license and exit
  -i, --interactive      be interactive, default is no
 
 =head1 OPTION DESCRIPTIONS
