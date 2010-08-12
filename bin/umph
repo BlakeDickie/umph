@@ -159,18 +159,16 @@ sub toggle_number {
 }
 
 sub help {
-    print STDERR "
-Commands:
+    print STDERR
+"Commands:
   help      .. this
-  list      .. display playlist entries (numbered, *=selected)
+  list      .. display playlist entries (> indicates selection)
   all       .. select all videos
   none      .. select none
   revert    .. revert selection
   (number)  .. toggle (select, unselect) video, see list output
--
   dump      .. dump selected video urls to stdout and exit
   quit      .. terminate program
-
 Command name abbreviations are allowed, e.g. \"a\" instead of \"all\".
 ";
 }
@@ -182,7 +180,7 @@ sub quit {
 sub list {
     my $i = 0;
     foreach (@entries) {
-        printf STDERR "%2d: $_->{title}%s\n", ++$i, $_->{selected} ? "*" : "";
+        printf STDERR "%2s%02d: $_->{title}\n", $_->{selected} ? ">" : "", ++$i;
     }
 }
 
