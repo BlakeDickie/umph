@@ -26,7 +26,7 @@ bin/umph file manually to your path and start using it. The Makefile.PL
 
 * Make sure you remove any earlier versions of umph before you continue
 
-* INSTALL_BASE can be passed into Makefile.PL to change where clive will
+* INSTALL_BASE can be passed into Makefile.PL to change where umph will
 be installed. For example:
 
     perl Makefile.PL INSTALL_BASE=/usr/local
