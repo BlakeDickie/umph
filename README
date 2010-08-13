@@ -1,43 +1,46 @@
 
-About
------
 
-umph is a command line tool for parsing Youtube playlists. It prints
-playlist video links, each separated with a newline, to the standard
-output stream, while everything else gets printed to the standard
-error stream. umph can be run with a simple interactive prompt to
-select the printed video links.
+    In brief
+
+umph is a command line tool for parsing Youtube playlists. It
+dumps the parsed video links to the standard output, each link
+separated with a newline.
 
 Project:
-  http://umph.googlecode.com/
+  <http://umph.googlecode.com/>
 
 Development repository:
-  git clone git://repo.or.cz/umph.git
+  <git://repo.or.cz/umph.git>
 
 
-Installation
-------------
+    Installation
 
-Note that installation is *optional*. You can just as well copy the
-bin/umph file manually to your path and start using it. The Makefile.PL
-(and friends) exist primarily to ease the distribution process of umph.
+This is an optional step, you could just as well copy the bin/umph
+file to your path and start using it. The installation takes care
+of generating the umph(1) manual from bin/umph but you can also
+use "perldoc bin/umph" if you want to skip the installation
+altogether.
 
-* See Makefile.PL for prerequisites
+Prerequisites:
 
-* Make sure you remove any earlier versions of umph before you continue
+  * See Makefile.PL for these
 
-* INSTALL_BASE can be passed into Makefile.PL to change where umph will
-be installed. For example:
+If you choose to install:
+
+  * Make sure you REMOVE any earlier version of umph before you continue
+
+  * INSTALL_BASE can be passed into Makefile.PL to change where umph will
+  be installed, e.g.:
 
     perl Makefile.PL INSTALL_BASE=/usr/local
 
-Typical installation:
+  * Typical steps:
 
-perl Makefile.PL
-make
-make install
+    perl Makefile.PL
+    make
+    make install
 
-For ExtUtils::MakeMaker documentation, see:
-  http://search.cpan.org/perldoc?ExtUtils::MakeMaker
+    Refer to the ExtUtils::MakeMaker documentation when in doubt:
+        <http://search.cpan.org/perldoc?ExtUtils::MakeMaker>
 
 
