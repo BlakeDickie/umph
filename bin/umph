@@ -212,7 +212,7 @@ __END__
 
 =head1 NAME
 
-umph - Youtube video playlist parser for cclive and alike tools
+umph - Youtube video playlist parser for cclive and similar tools
 
 =head1 SYNOPSIS
 
@@ -220,11 +220,9 @@ umph [options] [URL|PLAYLIST_ID]
 
 =head1 DESCRIPTION
 
-umph is a command line tool for parsing Youtube playlists. It prints
-playlist video links, each separated with a newline, to the standard
-output stream, while everything else gets printed to the standard
-error stream. umph can be run with a simple interactive prompt to
-select the printed video links.
+umph is a command line tool for parsing Youtube playlists. It
+dumps the parsed video links to the standard output, each link
+separated with a newline.
 
 =head1 OPTIONS
 
@@ -251,8 +249,8 @@ Print license and exit.
 
 =item B<-i, --interactive>
 
-Be interactive, default is no. Implies the interactive prompt which
-can be used select the printed video links.
+Enable interactive prompt which can be used to select the videos
+from the playlist. By default umph selects all of the playlist items.
 
 =back
 
@@ -264,11 +262,15 @@ can be used select the printed video links.
 
 =item umph AAF3A1D0CA1E304F
 
-Both fetch and parse the same playlist (identified as "AAF3A1D0CA1E304F").
+Typical use. Both achieve the same.
 
 =item umph AAF3A1D0CA1E304F | cclive -f sd_270p
 
-Passes the parsed video links to cclive.
+Dumps all of the playlist items to standard output from which
+cclive reads them and downloads the videos.
+
+You can use the C<--interactive> switch if you want to select
+which of the items you want to download with cclive.
 
 =back
 
@@ -288,15 +290,25 @@ echo "--interactive" >> ~/.umphrc
 
 =head1 OTHER
 
+=over 4
+
+=item B<http_proxy>
+
 umph depends on XML::DOM which uses LWP::UserAgent to retrieve
 the playlist data. Note that LWP::UserAgent reads http_proxy
 environment setting.
 
-Project:
-  http://umph.googlecode.com/
+=item B<Project>
 
-Development repository:
-  git clone git://repo.or.cz/umph.git
+<http://umph.googlecode.com/>
+
+=item B<Development repository>
+
+<git://repo.or.cz/umph.git>
+
+e.g. git clone git://repo.or.cz/umph.git
+
+=back
 
 =head1 SEE ALSO
 
@@ -304,7 +316,7 @@ C<cclive(1)> C<clive(1)>
 
 =head1 AUTHOR
 
-Toni Gundogdu <legatvs@gmail.com>
+Toni Gundogdu <legatvs gmail com>
 
 =cut
 
