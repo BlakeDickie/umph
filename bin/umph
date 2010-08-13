@@ -245,6 +245,10 @@ Print help and exit.
 
 Print version and exit.
 
+=item B<--license>
+
+Print license and exit.
+
 =item B<-i, --interactive>
 
 Be interactive, default is no. Implies the interactive prompt which
