@@ -3,7 +3,7 @@ Version 0.1.2
 
 Changes:
   * Add --license
-  * Change indication for the selected videos (interactive)
+  * Change indication (>) for selected videos (--interactive)
 
 
 Version 0.1.1
