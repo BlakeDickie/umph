@@ -135,8 +135,7 @@ sub prompt {
         'n' => \&select_none,
         'r' => \&revert_selection,
     );
-    print STDERR "Enter prompt\nNote: all videos selected by default\n";
-    print STDERR "Type \"help\" to get a list of commands\n";
+    print STDERR "Enter prompt. Type \"help\" to get a list of commands.\n";
     while ( !$done ) {
         print STDERR $p;
         my $ln = <STDIN>;
