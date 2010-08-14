@@ -87,15 +87,13 @@ sub main {
     }
     $url .= "?v=2";
 
-    print STDERR "Fetch $url ...\n";
+    print STDERR "Checking ...";
 
     require XML::DOM;
 
     my $p    = new XML::DOM::Parser;
     my $doc  = $p->parsefile($url);
     my $root = $doc->getDocumentElement;
-
-    print STDERR ":: Parse playlist for video entries ...\n";
 
     for my $entry ( $root->getElementsByTagName("entry") ) {
 
@@ -106,11 +104,13 @@ sub main {
 
         my %data = ( title => $title, url => $link, selected => 1 );
         push @entries, \%data;
+
+        print STDERR ".";
     }
 
-    $doc->dispose;
+    print STDERR "done.\n";
 
-    print STDERR "::: Found " . scalar @entries . " video entries\n";
+    $doc->dispose;
 
     prompt() if $config{interactive};
 
@@ -125,7 +125,7 @@ sub to_item {
 }
 
 sub prompt {
-    my $p    = "(umph) ";
+
     my %cmds = (
         'h' => \&help,
         'q' => \&quit,
@@ -135,7 +135,12 @@ sub prompt {
         'n' => \&select_none,
         'r' => \&revert_selection,
     );
+
     print STDERR "Enter prompt. Type \"help\" to get a list of commands.\n";
+    list();
+
+    my $p = "(umph) ";
+
     while ( !$done ) {
         print STDERR $p;
         my $ln = <STDIN>;
