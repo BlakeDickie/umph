@@ -238,8 +238,8 @@ separated with a newline.
  -h, --help             print help and exit
  -v, --version          print version and exit
      --license          print license and exit
- -i, --interactive      be interactive, default is no
-     --csv              print details in csv
+ -i, --interactive      be interactive
+ --csv                  print details in csv
 
 =head1 OPTION DESCRIPTIONS
 
