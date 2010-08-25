@@ -40,6 +40,7 @@ sub init {
     GetOptions(
         \%config,
         'interactive|i',
+        'csv',
         'version|v' => \&print_version,
         'license'   => \&print_license,
         'help|h'    => \&print_help,
@@ -115,7 +116,11 @@ sub main {
     prompt() if $config{interactive};
 
     foreach (@entries) {
-        print "$_->{url}\n" if $_->{selected} || !$config{interactive};
+        if ($_->{selected} or not $config{interactive}) {
+            $config{csv}
+                ? print qq/"$_->{title}","$_->{url}"\n/
+                : print "$_->{url}\n";
+        }
     }
 }
 
@@ -234,6 +239,7 @@ separated with a newline.
  -v, --version          print version and exit
      --license          print license and exit
  -i, --interactive      be interactive, default is no
+     --csv              print details in csv
 
 =head1 OPTION DESCRIPTIONS
 
@@ -255,6 +261,10 @@ Print license and exit.
 
 Enable interactive prompt which can be used to select the videos
 from the playlist. By default umph selects all of the playlist items.
+
+=item B<--csv>
+
+Print details in CSV ("$title","$url"\n).
 
 =back
 
