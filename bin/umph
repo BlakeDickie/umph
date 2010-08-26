@@ -113,6 +113,9 @@ sub main {
 
     $doc->dispose;
 
+    print STDERR "error: nothing found.\n" and exit 1
+        if scalar @entries;
+
     prompt() if $config{interactive};
 
     foreach (@entries) {
