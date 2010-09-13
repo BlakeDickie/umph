@@ -367,17 +367,22 @@ echo "--interactive" >> ~/.umphrc
 
 =back
 
-=head1 OTHER
+=head1 NOTES
 
 =over 4
 
 =item B<http_proxy>
 
-umph depends on XML::DOM which uses LWP::UserAgent to retrieve
-the playlist data. Note that LWP::UserAgent reads http_proxy
-environment setting. e.g.:
+umph depends on XML::DOM which uses LWP::UserAgent to fetch the data
+over the network. LWP::UserAgent reads the http_proxy environment
+setting. e.g.:
 
     env http_proxy=http://foo:1234 umph AAF3A1D0CA1E304F
+
+=item B<Unavailable feeds>
+
+Some feeds may have been set private by the Youtube users. umph
+cannot currently fetch and parse those.
 
 =item B<Project>
 
