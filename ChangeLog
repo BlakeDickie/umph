@@ -2,6 +2,7 @@
 Version 0.1.4
 
 Changes:
+  * Add --max-results, --start-index
   * Add --type and support for additional feeds (favorites, uploads)
 
 Bugfixes:
