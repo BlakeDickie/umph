@@ -332,6 +332,10 @@ Print details in CSV ("$title","$url"\n).
 
 Fetch and parse playlist "AAF3A1D0CA1E304F".
 
+=item umph -s 11 -m 10 AAF3A1D0CA1E304F
+
+Same as above but get the items 11-20 from the playlist.
+
 =item umph -t f youtube
 
 Fetch and parse favorites for user "youtube".
