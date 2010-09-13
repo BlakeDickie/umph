@@ -32,9 +32,7 @@ my %config;
 my @entries;
 my $done = 0;
 
-init();
-main();
-exit 0;
+exit main();
 
 sub init {
 
@@ -62,7 +60,7 @@ sub print_version {
 
 sub print_license {
     print
-        "Copyright (C) 2010 Toni Gundogdu. GNU GPL v3+. This is free software;
+"Copyright (C) 2010 Toni Gundogdu. GNU GPL v3+. This is free software;
 see the source for copying conditions. There is NO warranty; not even
 for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 ";
@@ -75,6 +73,8 @@ sub print_help {
 }
 
 sub main {
+
+    init();
 
     print_help if scalar @ARGV == 0;
 
@@ -104,7 +104,7 @@ sub main {
 
     $doc->dispose;
 
-    print STDERR "error: nothing found.\n" and exit 1
+    print STDERR "error: nothing found.\n" and return 1
         unless scalar @entries;
 
     prompt() if $config{interactive};
@@ -116,6 +116,8 @@ sub main {
                 : print "$_->{url}\n";
         }
     }
+
+    return 0;
 }
 
 sub from_arg {
@@ -196,20 +198,12 @@ Command name abbreviations are allowed, e.g. \"a\" instead of \"all\".
 ";
 }
 
-sub quit {
-    exit 0;
-}
-
 sub list {
     my $i = 0;
     foreach (@entries) {
         printf STDERR "%2s%02d: $_->{title}\n", $_->{selected} ? ">" : "",
             ++$i;
     }
-}
-
-sub dump {
-    $done = 1;
 }
 
 sub select_all {
@@ -226,6 +220,10 @@ sub revert_selection {
     $_->{selected} = !$_->{selected} foreach @entries;
     list();
 }
+
+sub quit { exit 0; }
+
+sub dump { $done = 1; }
 
 __END__
 
