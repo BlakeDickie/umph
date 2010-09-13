@@ -187,7 +187,7 @@ sub toggle_number {
 sub help {
     print STDERR "Commands:
   help      .. this
-  list      .. display playlist entries (> indicates selection)
+  list      .. list found videos (> indicates selected)
   all       .. select all videos
   none      .. select none
   revert    .. revert selection
