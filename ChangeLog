@@ -1,4 +1,13 @@
 
+Version 0.1.4
+
+Changes:
+  * Add --type and support for additional feeds (favorites, uploads)
+
+Bugfixes:
+  * Nothing found statement
+
+
 Version 0.1.3
 August 26, 2010
 
