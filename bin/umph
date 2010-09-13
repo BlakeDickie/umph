@@ -39,12 +39,15 @@ exit 0;
 sub init {
     GetOptions(
         \%config,
+        'type|t=s',
         'interactive|i',
         'csv',
         'version|v' => \&print_version,
         'license'   => \&print_license,
         'help|h'    => \&print_help,
     ) or exit(1);
+
+    $config{type} ||= 'p'; # Default to "playlist".
 }
 
 sub print_version {
@@ -70,30 +73,12 @@ sub main {
 
     print_help if scalar @ARGV == 0;
 
-    my $req_body = "http://gdata.youtube.com/feeds/api/playlists/";
-
-    my $url = $ARGV[0];
-
-    if ( $url =~ /^http:/i ) {
-
-        # Looks like an URL.
-        if ( $url =~ /view_play_list\?p=(.*?)$/i ) {
-            $url = "$req_body$1";
-        }
-    }
-    else {
-
-        # Assume playlist id.
-        $url = "$req_body$url";
-    }
-    $url .= "?v=2";
-
     print STDERR "Checking ...";
 
     require XML::DOM;
 
     my $p    = new XML::DOM::Parser;
-    my $doc  = $p->parsefile($url);
+    my $doc  = $p->parsefile (from_arg ($ARGV[0]));
     my $root = $doc->getDocumentElement;
 
     for my $entry ( $root->getElementsByTagName("entry") ) {
@@ -125,6 +110,19 @@ sub main {
                 : print "$_->{url}\n";
         }
     }
+}
+
+sub from_arg {
+    my ($arg0, $u) = @_;
+
+    if ($config{type} eq "u" or $config{type} eq "uploads")
+        { $u = "http://gdata.youtube.com/feeds/api/users/$arg0/uploads?v=2"; }
+    elsif ($config{type} eq "f" or $config{type} eq "favorites")
+        { $u = "http://gdata.youtube.com/feeds/api/users/$arg0/favorites?v=2"; }
+    else
+        { $u = "http://gdata.youtube.com/feeds/api/playlists/$arg0?v=2"; }
+
+    return $u;
 }
 
 sub to_item {
@@ -224,23 +222,26 @@ __END__
 
 =head1 NAME
 
-umph - Youtube video playlist parser for cclive and similar tools
+umph - Command line tool for parsing video links from Youtube feeds
 
 =head1 SYNOPSIS
 
-umph [options] [URL|PLAYLIST_ID]
+umph [-t E<lt>typeE<gt>] [E<lt>playlist_idE<gt> | E<lt>usernameE<gt>]
 
 =head1 DESCRIPTION
 
-umph is a command line tool for parsing Youtube playlists. It
-dumps the parsed video links to the standard output, each link
-separated with a newline.
+umph is a command line tool for parsing video links from Youtube feeds,
+such as playlists, favorites and uploads. The parsed video links are
+printed to the standard output each separated with a newline.
+
+If you need to select the videos, use the C<--interactive> switch.
 
 =head1 OPTIONS
 
  -h, --help             print help and exit
  -v, --version          print version and exit
      --license          print license and exit
+ -t, --type =arg        feed type, default is playlist
  -i, --interactive      be interactive
  --csv                  print details in csv
 
@@ -260,10 +261,20 @@ Print version and exit.
 
 Print license and exit.
 
+=item B<-t, --type>=I<arg>
+
+Specifies the feed type to get. I<arg> can be one of the following:
+
+  p, playlist  (arg0 will be treated as playlist ID)
+  f, favorites (arg0 will be treated as username)
+  u, uploads   (same)
+
+Default is "p" (playlist). See also L</EXAMPLES>.
+
 =item B<-i, --interactive>
 
-Enable interactive prompt which can be used to select the videos
-from the playlist. By default umph selects all of the playlist items.
+Enable interactive prompt which can be used to select the videos from the
+feed. By default umph selects all of the feed items.
 
 =item B<--csv>
 
@@ -275,19 +286,24 @@ Print details in CSV ("$title","$url"\n).
 
 =over 4
 
-=item umph "http://www.youtube.com/view_play_list?p=AAF3A1D0CA1E304F"
-
 =item umph AAF3A1D0CA1E304F
 
-Typical use. Both achieve the same.
+Fetch and parse playlist "AAF3A1D0CA1E304F".
+
+=item umph -t f youtube
+
+Fetch and parse favorites for user "youtube".
+
+=item umph -t u youtube
+
+Fetch and parse uploads for user "youtube".
 
 =item umph AAF3A1D0CA1E304F | cclive -f sd_270p
 
-Dumps all of the playlist items to standard output from which
-cclive reads them and downloads the videos.
+Print the parsed playlist items (links) to stdout, use C<cclive(1)>
+to download them.
 
-You can use the C<--interactive> switch if you want to select
-which of the items you want to download with cclive.
+Use C<--interactive> if you want to select the videos to be downloaded.
 
 =back
 
