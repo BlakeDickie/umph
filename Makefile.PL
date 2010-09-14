@@ -11,7 +11,7 @@ WriteMakefile(
     'NAME' => 'umph',
     ( $[ >= 5.8 )
     ? ( AUTHOR => 'Toni Gundogdu <legatvs@gmail.com>',
-        'ABSTRACT' => 'command line video playlist parser for c/clive'
+        'ABSTRACT' => 'command line tool for parsing video links from Youtube feeds'
         )
     : (),
     'VERSION'   => $version,
