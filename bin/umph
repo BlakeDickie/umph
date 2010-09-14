@@ -27,7 +27,7 @@ binmode( STDERR, ":utf8" );
 use Getopt::ArgvFile( home => 1, startupFilename => [qw(.umphrc)] );
 use Getopt::Long qw(:config bundling);
 
-my $VERSION = "0.1.4";
+my $VERSION = "0.1.5";
 my %config;
 my @entries;
 my $done = 0;
