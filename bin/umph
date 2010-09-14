@@ -233,7 +233,7 @@ umph - Command line tool for parsing video links from Youtube feeds
 
 =head1 SYNOPSIS
 
-umph [-t E<lt>typeE<gt>] [E<lt>playlist_idE<gt> | E<lt>usernameE<gt>]
+umph [-i] [--csv] [-t E<lt>typeE<gt>] [E<lt>playlist_idE<gt> | E<lt>usernameE<gt>]
 
 =head1 DESCRIPTION
 
