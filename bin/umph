@@ -349,8 +349,6 @@ Fetch and parse uploads for user "youtube".
 Print the parsed playlist items (links) to stdout, use C<cclive(1)>
 to download them.
 
-Use C<--interactive> if you want to select the videos to be downloaded.
-
 =back
 
 =head1 EXIT STATUS
