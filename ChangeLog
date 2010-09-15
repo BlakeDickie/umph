@@ -1,4 +1,10 @@
 
+Version 0.1.5
+
+Changes:
+  * Update synopsis, help strings
+  * Update abstract in Makefile.PL
+
 Version 0.1.4
 September 14, 2010
 
