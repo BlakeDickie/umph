@@ -245,14 +245,14 @@ If you need to select the videos, use the C<--interactive> switch.
 
 =head1 OPTIONS
 
- -h, --help                 print help and exit
- -v, --version              print version and exit
-     --license              print license and exit
- -t, --type =arg            feed type, default is playlist
- -s, --start-index =arg     index of first matching result
- -m, --max-results =arg     max number of results included
- -i, --interactive          be interactive
- --csv                      print details in csv
+ -h, --help              print help and exit
+ -v, --version           print version and exit
+     --license           print license and exit
+ -i, --interactive       run in interactive mode (default:no)
+ -t, --type =arg         feed type, default is playlist (default:p)
+ -s, --start-index =arg  index of first matching result (default:1)
+ -m, --max-results =arg  max number of results included (default:25)
+ --csv                   print details in csv (default:no)
 
 =head1 OPTION DESCRIPTIONS
 
