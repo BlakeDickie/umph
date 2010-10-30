@@ -364,6 +364,10 @@ Print details in CSV ("$title","$url"\n).
 
 Fetch and parse playlist "AAF3A1D0CA1E304F".
 
+=item umph --json AAF3A1D0CA1E304F
+
+Same as above, but print the details in JSON.
+
 =item umph -s 11 -m 10 AAF3A1D0CA1E304F
 
 Same as above but get the items 11-20 from the playlist.
@@ -432,7 +436,7 @@ C<cclive(1)> C<clive(1)>
 
 =head1 AUTHOR
 
-Toni Gundogdu <legatvs gmail com>
+Toni Gundogdu <legatvs at sign gmail com>
 
 =cut
 
