@@ -2,3 +2,6 @@
 ^Makefile$
 ^blib/
 ^\.
+^xml-test-data
+.gz
+TODO
