@@ -4,8 +4,9 @@
 Changes:
         - Add --json
         - Add t/umph-Pod.t
-        - Remove -v, -h
         - Use 'version' module
+        - Escape quotes in video titles before using them in json/csv
+        - Remove -v, -h
         - Dist to gz
 
 
