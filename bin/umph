@@ -43,10 +43,11 @@ sub init {
         'start_index|start-index|s=s',
         'max_results|max-results|m=s',
         'interactive|i',
+        'json',
         'csv',
-        'version|v' => \&print_version,
+        'version'   => \&print_version,
         'license'   => \&print_license,
-        'help|h'    => \&print_help,
+        'help'      => \&print_help,
     ) or exit(1);
 
     $config{type} ||= 'p';       # Default to "playlist".
@@ -110,13 +111,38 @@ sub main {
 
     prompt() if $config{interactive};
 
+    if ($config{json})
+        { print qq/{\n  "video": [\n/; }
+
+    my $i = 0;
+
     foreach (@entries) {
+
         if ($_->{selected} or not $config{interactive}) {
-            $config{csv}
-                ? print qq/"$_->{title}","$_->{url}"\n/
-                : print "$_->{url}\n";
+
+            ++$i;
+
+            if ($config{json}) {
+                print ",\n"  if $i > 1;
+                print
+                        "    {\n"
+                    . qq/      "title": "$_->{title}",\n/
+                    . qq/      "url": "$_->{url}"\n/
+                    .   "    }",
+            }
+
+            elsif ($config{csv})
+                { print qq/"$_->{title}","$_->{url}"\n/; }
+
+            else
+                { print "$_->{url}\n"; }
+
         }
+
     }
+
+    if ($config{json})
+        { print "\n  ]\n}\n"; }
 
     return 0;
 }
@@ -234,7 +260,7 @@ umph - Command line tool for parsing video links from Youtube feeds
 
 =head1 SYNOPSIS
 
-umph [-i] [--csv] [-t E<lt>typeE<gt>] [E<lt>playlist_idE<gt> | E<lt>usernameE<gt>]
+umph [-i] [--csv | --json] [-t E<lt>typeE<gt>] [E<lt>playlist_idE<gt> | E<lt>usernameE<gt>]
 
 =head1 DESCRIPTION
 
@@ -246,14 +272,15 @@ If you need to select the videos, use the C<--interactive> switch.
 
 =head1 OPTIONS
 
- -h, --help              print help and exit
- -v, --version           print version and exit
-     --license           print license and exit
- -i, --interactive       run in interactive mode (default:no)
- -t, --type =arg         feed type, default is playlist (default:p)
- -s, --start-index =arg  index of first matching result (default:1)
- -m, --max-results =arg  max number of results included (default:25)
- --csv                   print details in csv (default:no)
+     --help                  print help and exit
+     --version               print version and exit
+     --license               print license and exit
+ -i, --interactive           run in interactive mode
+ -t, --type arg (=p)         get feed type
+ -s, --start-index arg (=1)  index of first matching result
+ -m, --max-results arg (=25) max number of results included
+ --json                      print details in json
+ --csv                       print details in csv
 
 =head1 OPTION DESCRIPTIONS
 
@@ -318,6 +345,10 @@ umph defaults to 25.
 
 Enable interactive prompt which can be used to select the videos from the
 feed. By default umph selects all of the feed items.
+
+=item B<--json>
+
+Print details in JSON. Negates --csv.
 
 =item B<--csv>
 
