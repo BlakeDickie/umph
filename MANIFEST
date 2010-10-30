@@ -4,3 +4,4 @@ COPYING
 Makefile.PL
 MANIFEST
 README
+t/umph-Pod.t
