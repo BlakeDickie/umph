@@ -5,37 +5,21 @@ use strict;
 
 use ExtUtils::MakeMaker;
 
-my $version = get_version();
-
 WriteMakefile(
     'NAME' => 'umph',
+    VERSION_FROM => 'bin/umph',
     ( $[ >= 5.8 )
-    ? ( AUTHOR => 'Toni Gundogdu <legatvs@gmail.com>',
-        'ABSTRACT' => 'command line tool for parsing video links from Youtube feeds'
+    ? ( AUTHOR => 'Toni Gundogdu <legatvs at sign gmail com>',
+        'ABSTRACT' => 'Command line tool for parsing video links from Youtube feeds'
         )
     : (),
-    'VERSION'   => $version,
-    'EXE_FILES' => ['bin/umph'],
-    'PREREQ_PM' => {
-        'Getopt::ArgvFile' => 1.11, # tested, earlier may work
-        'XML::DOM' => 1.44, # tested, earlier may work
+    'VERSION_FROM'  => 'bin/umph',
+    'EXE_FILES'     => ['bin/umph'],
+    'PREREQ_PM'     => {
+# Earlier versions may work. The module has been confirmed to work with:
+'Getopt::ArgvFile'  => 1.11, # <http://search.cpan.org/perldoc?Getopt::ArgvFile>
+'XML::DOM'          => 1.44, # <http://search.cpan.org/perldoc?XML::DOM>
+'version'           => 0.77, # <http://search.cpan.org/perldoc?version>
     },
-    'LICENSE' => 'gpl',
-    dist => {
-        COMPRESS => 'bzip2',
-        SUFFIX => '.bz2'
-    },
+    'LICENSE' => 'gpl'
 );
-
-sub get_version {
-    my $path = 'bin/umph';
-    open my $fh, "<", $path or die "$path: $!";
-    foreach (<$fh>) {
-        close $fh and return $1
-            if $_ =~ /VERSION = "(.*?)"/;
-    }
-    close $fh;
-    die '$path: could not find version string.';
-}
-
-
