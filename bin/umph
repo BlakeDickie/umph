@@ -122,17 +122,22 @@ sub main {
 
             ++$i;
 
+            my $t =  $_->{title} || "";
+               $t =~ s/"/\\"/g;
+
             if ($config{json}) {
+
                 print ",\n"  if $i > 1;
+
                 print
                         "    {\n"
-                    . qq/      "title": "$_->{title}",\n/
+                    . qq/      "title": "$t",\n/
                     . qq/      "url": "$_->{url}"\n/
                     .   "    }",
             }
 
             elsif ($config{csv})
-                { print qq/"$_->{title}","$_->{url}"\n/; }
+                { print qq/"$t","$_->{url}"\n/; }
 
             else
                 { print "$_->{url}\n"; }
@@ -185,30 +190,35 @@ sub prompt {
 
     my $p = "(umph) ";
 
-    while ( !$done ) {
+    while (not $done) {
+
         print STDERR $p;
+
         my $ln = <STDIN>;
-        next if !$ln;
+
+        next unless $ln;
         chomp $ln;
-        if ( $ln =~ /(\d+)/ ) {
-            toggle_number($1);
-        }
+
+        if ( $ln =~ /(\d+)/ )
+            { toggle_number($1); }
+
         else {
             next if $ln !~ /(\w)/;
-            $cmds{$1}() if defined $cmds{$1};
+            $cmds{$1}()  if defined $cmds{$1};
         }
+
     }
+
 }
 
 sub toggle_number {
     my $i = (shift) - 1;
     if ( $i >= 0 && exists $entries[$i] ) {
-        $entries[$i]->{selected} = !$entries[$i]->{selected};
+        $entries[$i]->{selected} = not $entries[$i]->{selected};
         list();
     }
-    else {
-        printf STDERR "error: out of range\n";
-    }
+    else
+        { printf STDERR "error: out of range\n"; }
 }
 
 sub help {
@@ -228,7 +238,10 @@ Command name abbreviations are allowed, e.g. \"a\" instead of \"all\".
 sub list {
     my $i = 0;
     foreach (@entries) {
-        printf STDERR "%2s%02d: $_->{title}\n", $_->{selected} ? ">" : "",
+        printf STDERR "%2s%02d: $_->{title}\n",
+            $_->{selected}
+                ? ">"
+                : "",
             ++$i;
     }
 }
@@ -244,7 +257,7 @@ sub select_none {
 }
 
 sub revert_selection {
-    $_->{selected} = !$_->{selected} foreach @entries;
+    $_->{selected} = not $_->{selected}  foreach @entries;
     list();
 }
 
