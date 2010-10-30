@@ -3,8 +3,10 @@
 
 Changes:
         - Add --json
+        - Add t/umph-Pod.t
         - Remove -v, -h
         - Use 'version' module
+        - Dist to gz
 
 
 Version 0.1.5
