@@ -1,6 +1,5 @@
 
-0.1.6
-
+0.1.6  Sun Oct 31 2010  legatvs
 Changes:
         - Add --json
         - Add t/umph-Pod.t
