@@ -45,6 +45,8 @@ sub init {
         'interactive|i',
         'json',
         'csv',
+        'proxy=s',
+        'no_proxy|no-proxy',
         'version'   => \&print_version,
         'license'   => \&print_license,
         'help'      => \&print_help,
@@ -82,9 +84,18 @@ sub main {
 
     print STDERR "Checking ...";
 
+    require LWP;
+
+    my $a = new LWP::UserAgent;
+
+    $a->env_proxy; # http://search.cpan.org/perldoc?LWP::UserAgent
+
+    $a->proxy    ('http', $config{proxy}) if $config{proxy};
+    $a->no_proxy ('') if $config{no_proxy};
+
     require XML::DOM;
 
-    my $p    = new XML::DOM::Parser;
+    my $p    = new XML::DOM::Parser (LWP_UserAgent => $a);
     my $doc  = $p->parsefile (from_arg ($ARGV[0]));
     my $root = $doc->getDocumentElement;
 
@@ -273,7 +284,9 @@ umph - Command line tool for parsing video links from Youtube feeds
 
 =head1 SYNOPSIS
 
-umph [-i] [--csv | --json] [-t E<lt>typeE<gt>] [E<lt>playlist_idE<gt> | E<lt>usernameE<gt>]
+umph [-i] [--csv | --json] [-t E<lt>typeE<gt>]
+    [--proxy E<lt>foo:1234E<gt> | --no-proxy]
+    [E<lt>playlist_idE<gt> | E<lt>usernameE<gt>]
 
 =head1 DESCRIPTION
 
@@ -285,15 +298,17 @@ If you need to select the videos, use the C<--interactive> switch.
 
 =head1 OPTIONS
 
-     --help                  print help and exit
-     --version               print version and exit
-     --license               print license and exit
- -i, --interactive           run in interactive mode
- -t, --type arg (=p)         get feed type
- -s, --start-index arg (=1)  index of first matching result
- -m, --max-results arg (=25) max number of results included
- --json                      print details in json
- --csv                       print details in csv
+     --help                     print help and exit
+     --version                  print version and exit
+     --license                  print license and exit
+ -i, --interactive              run in interactive mode
+ -t, --type arg (=p)            get feed type
+ -s, --start-index arg (=1)     index of first matching result
+ -m, --max-results arg (=25)    max number of results included
+     --json                     print details in json
+     --csv                      print details in csv
+     --proxy arg (=http_proxy)  use proxy for http connections
+     --no-proxy                 disable use of http proxy
 
 =head1 OPTION DESCRIPTIONS
 
@@ -366,6 +381,16 @@ Print details in JSON. Negates --csv.
 =item B<--csv>
 
 Print details in CSV ("$title","$url"\n).
+
+=item B<--proxy> I<arg>
+
+Use I<arg> for HTTP proxy, e.g. "http://foo:1234". Overrides the http_proxy
+environment setting.
+
+=item B<--no-proxy>
+
+Disable use of HTTP proxy. Overrides both C<--proxy> and http_proxy environment
+settings.
 
 =back
 
