@@ -24,7 +24,7 @@ use strict;
 binmode( STDOUT, ":utf8" );
 binmode( STDERR, ":utf8" );
 
-use version 0.77 (); our $VERSION = version->declare ("0.1.6");
+use version 0.77 (); our $VERSION = version->declare ("0.1.7");
 
 use Getopt::ArgvFile( home => 1, startupFilename => [qw(.umphrc)] );
 use Getopt::Long qw(:config bundling);
