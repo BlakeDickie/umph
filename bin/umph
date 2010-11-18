@@ -285,7 +285,7 @@ umph - Command line tool for parsing video links from Youtube feeds
 =head1 SYNOPSIS
 
 umph [-i] [--csv | --json] [-t E<lt>typeE<gt>]
-    [--proxy E<lt>foo:1234E<gt> | --no-proxy]
+    [--proxy E<lt>addrE<gt> | --no-proxy]
     [E<lt>playlist_idE<gt> | E<lt>usernameE<gt>]
 
 =head1 DESCRIPTION
