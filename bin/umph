@@ -21,23 +21,23 @@
 use warnings;
 use strict;
 
-binmode( STDOUT, ":utf8" );
-binmode( STDERR, ":utf8" );
+binmode STDOUT, ":utf8";
+binmode STDERR, ":utf8";
 
 use version 0.77 (); our $VERSION = version->declare ("0.1.7");
 
-use Getopt::ArgvFile( home => 1, startupFilename => [qw(.umphrc)] );
-use Getopt::Long qw(:config bundling);
+use Getopt::ArgvFile (home => 1, startupFilename => [qw(.umphrc)]);
+use Getopt::Long qw (:config bundling);
 
 my %config;
 my @entries;
 my $done = 0;
 
-exit main();
+exit main ();
 
 sub init {
 
-    GetOptions(
+    GetOptions (
         \%config,
         'type|t=s',
         'start_index|start-index|s=s',
@@ -47,10 +47,11 @@ sub init {
         'csv',
         'proxy=s',
         'no_proxy|no-proxy',
+        'quiet|q',
         'version'   => \&print_version,
         'license'   => \&print_license,
         'help'      => \&print_help,
-    ) or exit(1);
+    ) or exit 1;
 
     $config{type} ||= 'p';       # Default to "playlist".
     $config{start_index} ||= 1;  # Default to 1.
@@ -73,16 +74,16 @@ for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 
 sub print_help {
     require Pod::Usage;
-    Pod::Usage::pod2usage( -exitstatus => 0, -verbose => 1 );
+    Pod::Usage::pod2usage (-exitstatus => 0, -verbose => 1);
 }
 
 sub main {
 
-    init();
+    init ();
 
     print_help if scalar @ARGV == 0;
 
-    print STDERR "Checking ...";
+    print STDERR "Checking ..."  unless $config{quiet};
 
     require LWP;
 
@@ -99,28 +100,28 @@ sub main {
     my $doc  = $p->parsefile (from_arg ($ARGV[0]));
     my $root = $doc->getDocumentElement;
 
-    for my $entry ( $root->getElementsByTagName("entry") ) {
+    for my $entry ($root->getElementsByTagName ("entry")) {
 
-        my $title = to_item( $entry, "title" )->getFirstChild->getNodeValue;
+        my $title = to_item ($entry, "title")->getFirstChild->getNodeValue;
 
         my $link =
-            to_item( $entry, "link" )->getAttributeNode("href")->getValue;
+            to_item ($entry, "link")->getAttributeNode ("href")->getValue;
 
-        my %data = ( title => $title, url => $link, selected => 1 );
+        my %data = (title => $title, url => $link, selected => 1);
 
         push @entries, \%data;
 
-        print STDERR ".";
+        print STDERR "."  unless $config{quiet};
     }
 
-    print STDERR "done.\n";
+    print STDERR "done.\n"  unless $config{quiet};
 
     $doc->dispose;
 
     print STDERR "error: nothing found.\n" and return 1
         unless scalar @entries;
 
-    prompt() if $config{interactive};
+    prompt () if $config{interactive};
 
     if ($config{json})
         { print qq/{\n  "video": [\n/; }
@@ -180,8 +181,8 @@ sub from_arg {
 }
 
 sub to_item {
-    my ( $entry, $name ) = @_;
-    return $entry->getElementsByTagName($name)->item(0);
+    my ($entry, $name) = @_;
+    return $entry->getElementsByTagName($name)->item (0);
 }
 
 sub prompt {
@@ -197,7 +198,7 @@ sub prompt {
     );
 
     print STDERR "Enter prompt. Type \"help\" to get a list of commands.\n";
-    list();
+    list ();
 
     my $p = "(umph) ";
 
@@ -211,11 +212,11 @@ sub prompt {
         chomp $ln;
 
         if ( $ln =~ /(\d+)/ )
-            { toggle_number($1); }
+            { toggle_number ($1); }
 
         else {
             next if $ln !~ /(\w)/;
-            $cmds{$1}()  if defined $cmds{$1};
+            $cmds{$1} ()  if defined $cmds{$1};
         }
 
     }
@@ -224,9 +225,9 @@ sub prompt {
 
 sub toggle_number {
     my $i = (shift) - 1;
-    if ( $i >= 0 && exists $entries[$i] ) {
+    if ($i >= 0 && exists $entries[$i]) {
         $entries[$i]->{selected} = not $entries[$i]->{selected};
-        list();
+        list ();
     }
     else
         { printf STDERR "error: out of range\n"; }
@@ -259,17 +260,17 @@ sub list {
 
 sub select_all {
     $_->{selected} = 1 foreach @entries;
-    list();
+    list ();
 }
 
 sub select_none {
     $_->{selected} = 0 foreach @entries;
-    list();
+    list ();
 }
 
 sub revert_selection {
     $_->{selected} = not $_->{selected}  foreach @entries;
-    list();
+    list ();
 }
 
 sub quit { exit 0; }
@@ -284,7 +285,7 @@ umph - Command line tool for parsing video links from Youtube feeds
 
 =head1 SYNOPSIS
 
-umph [-i] [--csv | --json] [-t E<lt>typeE<gt>]
+umph [-q] [-i] [--csv | --json] [-t E<lt>typeE<gt>]
     [--proxy E<lt>addrE<gt> | --no-proxy]
     [E<lt>playlist_idE<gt> | E<lt>usernameE<gt>]
 
@@ -301,6 +302,7 @@ If you need to select the videos, use the C<--interactive> switch.
      --help                     print help and exit
      --version                  print version and exit
      --license                  print license and exit
+ -q, --quiet                    be quiet
  -i, --interactive              run in interactive mode
  -t, --type arg (=p)            get feed type
  -s, --start-index arg (=1)     index of first matching result
@@ -325,6 +327,10 @@ Print version and exit.
 =item B<--license>
 
 Print license and exit.
+
+=item B<-q, --quiet>
+
+Be quiet.
 
 =item B<-t, --type>=I<arg>
 

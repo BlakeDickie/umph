@@ -1,6 +1,7 @@
 
 0.1.7
 Changes:
+        - Add --quiet
         - Add --proxy, --no-proxy
 
 
