@@ -1,7 +1,10 @@
 bin/umph
 ChangeLog
+ChangeLog.pre-gitlog
 COPYING
 Makefile.PL
 MANIFEST
+man1/umph.1.pod
+NEWS
 README
 t/umph-Pod.t
