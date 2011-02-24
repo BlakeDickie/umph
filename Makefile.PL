@@ -3,6 +3,7 @@
 use warnings;
 use strict;
 
+use 5.008009;
 use ExtUtils::MakeMaker;
 
 WriteMakefile(
@@ -21,5 +22,17 @@ WriteMakefile(
 'XML::DOM'          => 1.44, # <http://search.cpan.org/perldoc?XML::DOM>
 'version'           => 0.77, # <http://search.cpan.org/perldoc?version>
     },
-    'LICENSE' => 'gpl'
+    'LICENSE' => 'gpl',
+    'MAN1PODS' =>
+        { 'man1/umph.1.pod' => '$(INST_MAN1DIR)/umph.$(MAN1EXT)' },
+    dist => {
+        PREOP =>
+'@if test -f .git/HEAD; then \
+	git log --stat --after="Thu Feb 24 22:09:34 2011" >ChangeLog; \
+fi',
+        POSTOP   =>
+'@if test -f .git/HEAD; then \
+	git checkout ChangeLog; \
+fi',
+    },
 );
