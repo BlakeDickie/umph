@@ -1,8 +1,8 @@
 #!/usr/bin/perl
 # -*- coding: ascii -*-
 
-#
-# Copyright (C) 2010 Toni Gundogdu <legatvs@gmail.com>.
+# umph
+# Copyright (C) 2010,2011  Toni Gundogdu <legatvs@gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -24,20 +24,19 @@ use strict;
 binmode STDOUT, ":utf8";
 binmode STDERR, ":utf8";
 
-use version 0.77 (); our $VERSION = version->declare ("0.1.8");
+use version 0.77 (); our $VERSION = version->declare("0.1.8");
 
-use Getopt::ArgvFile (home => 1, startupFilename => [qw(.umphrc)]);
+use Getopt::ArgvFile ( home => 1, startupFilename => [qw(.umphrc)] );
 use Getopt::Long qw (:config bundling);
 
 my %config;
 my @entries;
 my $done = 0;
 
-exit main ();
+exit main();
 
 sub init {
-
-    GetOptions (
+    GetOptions(
         \%config,
         'type|t=s',
         'start_index|start-index|s=s',
@@ -48,14 +47,14 @@ sub init {
         'proxy=s',
         'no_proxy|no-proxy',
         'quiet|q',
-        'version'   => \&print_version,
-        'license'   => \&print_license,
-        'help'      => \&print_help,
+        'version' => \&print_version,
+        'license' => \&print_license,
+        'help'    => \&print_help,
     ) or exit 1;
 
-    $config{type} ||= 'p';       # Default to "playlist".
-    $config{start_index} ||= 1;  # Default to 1.
-    $config{max_results} ||= 25; # Default 25.
+    $config{type}        ||= 'p';    # Default to "playlist".
+    $config{start_index} ||= 1;      # Default to 1.
+    $config{max_results} ||= 25;     # Default 25.
 }
 
 sub print_version {
@@ -64,115 +63,121 @@ sub print_version {
 }
 
 sub print_license {
-    print
-"Copyright (C) 2010 Toni Gundogdu. GNU GPL v3+. This is free software;
-see the source for copying conditions. There is NO warranty; not even
-for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    print "# Copyright (C) 2010,2011  Toni Gundogdu.
+#
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ";
     exit 0;
 }
 
 sub print_help {
     require Pod::Usage;
-    Pod::Usage::pod2usage (-exitstatus => 0, -verbose => 1);
+    Pod::Usage::pod2usage( -exitstatus => 0, -verbose => 1 );
 }
 
 sub main {
-
-    init ();
+    init();
 
     print_help if scalar @ARGV == 0;
 
-    print STDERR "Checking ..."  unless $config{quiet};
+    print STDERR "Checking ..." unless $config{quiet};
 
     require LWP;
 
     my $a = new LWP::UserAgent;
 
-    $a->env_proxy; # http://search.cpan.org/perldoc?LWP::UserAgent
+    $a->env_proxy;    # http://search.cpan.org/perldoc?LWP::UserAgent
 
-    $a->proxy    ('http', $config{proxy}) if $config{proxy};
-    $a->no_proxy ('') if $config{no_proxy};
+    $a->proxy( 'http', $config{proxy} ) if $config{proxy};
+    $a->no_proxy('') if $config{no_proxy};
 
     require XML::DOM;
 
-    my $p    = new XML::DOM::Parser (LWP_UserAgent => $a);
-    my $doc  = $p->parsefile (from_arg ($ARGV[0]));
+    my $p    = new XML::DOM::Parser( LWP_UserAgent => $a );
+    my $doc  = $p->parsefile( from_arg( $ARGV[0] ) );
     my $root = $doc->getDocumentElement;
 
-    for my $entry ($root->getElementsByTagName ("entry")) {
+    for my $entry ( $root->getElementsByTagName("entry") ) {
 
-        my $title = to_item ($entry, "title")->getFirstChild->getNodeValue;
+        my $title =
+          to_item( $entry, "title" )->getFirstChild->getNodeValue;
 
         my $link =
-            to_item ($entry, "link")->getAttributeNode ("href")->getValue;
+          to_item( $entry, "link" )->getAttributeNode("href")->getValue;
 
-        my %data = (title => $title, url => $link, selected => 1);
+        my %data = ( title => $title, url => $link, selected => 1 );
 
         push @entries, \%data;
 
-        print STDERR "."  unless $config{quiet};
+        print STDERR "." unless $config{quiet};
     }
 
-    print STDERR "done.\n"  unless $config{quiet};
+    print STDERR "done.\n" unless $config{quiet};
 
     $doc->dispose;
 
     print STDERR "error: nothing found.\n" and return 1
-        unless scalar @entries;
+      unless scalar @entries;
 
-    prompt () if $config{interactive};
+    prompt() if $config{interactive};
 
-    if ($config{json})
-        { print qq/{\n  "video": [\n/; }
+    if ( $config{json} ) { print qq/{\n  "video": [\n/; }
 
     my $i = 0;
 
     foreach (@entries) {
 
-        if ($_->{selected} or not $config{interactive}) {
+        if ( $_->{selected} or not $config{interactive} ) {
 
             ++$i;
 
-            my $t =  $_->{title} || "";
-               $t =~ s/"/\\"/g;
+            my $t = $_->{title} || "";
+            $t =~ s/"/\\"/g;
 
-            if ($config{json}) {
-
-                print ",\n"  if $i > 1;
-
-                print
-                        "    {\n"
-                    . qq/      "title": "$t",\n/
-                    . qq/      "url": "$_->{url}"\n/
-                    .   "    }",
+            if ( $config{json} ) {
+                print ",\n" if $i > 1;
+                print "    {\n"
+                  . qq/      "title": "$t",\n/
+                  . qq/      "url": "$_->{url}"\n/ . "    }",
+                  ;
             }
 
-            elsif ($config{csv})
-                { print qq/"$t","$_->{url}"\n/; }
+            elsif ( $config{csv} ) { print qq/"$t","$_->{url}"\n/; }
 
-            else
-                { print "$_->{url}\n"; }
-
+            else { print "$_->{url}\n"; }
         }
-
     }
 
-    if ($config{json})
-        { print "\n  ]\n}\n"; }
+    if ( $config{json} ) { print "\n  ]\n}\n"; }
 
     return 0;
 }
 
 sub from_arg {
-    my ($arg0, $u) = @_;
+    my ( $arg0, $u ) = @_;
 
-    if ($config{type} eq "u" or $config{type} eq "uploads")
-        { $u = "http://gdata.youtube.com/feeds/api/users/$arg0/uploads?v=2"; }
-    elsif ($config{type} eq "f" or $config{type} eq "favorites")
-        { $u = "http://gdata.youtube.com/feeds/api/users/$arg0/favorites?v=2"; }
-    else
-        { $u = "http://gdata.youtube.com/feeds/api/playlists/$arg0?v=2"; }
+    my $c = "http://gdata.youtube.com/feeds/api";
+
+    if ( $config{type} eq "u" or $config{type} eq "uploads" ) {
+        $u = "$c/users/$arg0/uploads?v=2";
+    }
+    elsif ( $config{type} eq "f" or $config{type} eq "favorites" ) {
+        $u = "$c/users/$arg0/favorites?v=2";
+    }
+    else {
+        $u = "$c/playlists/$arg0?v=2";
+    }
 
     $u .= "&start-index=$config{start_index}";
     $u .= "&max-results=$config{max_results}";
@@ -181,12 +186,11 @@ sub from_arg {
 }
 
 sub to_item {
-    my ($entry, $name) = @_;
-    return $entry->getElementsByTagName($name)->item (0);
+    my ( $entry, $name ) = @_;
+    return $entry->getElementsByTagName($name)->item(0);
 }
 
 sub prompt {
-
     my %cmds = (
         'h' => \&help,
         'q' => \&quit,
@@ -197,12 +201,13 @@ sub prompt {
         'r' => \&revert_selection,
     );
 
-    print STDERR "Enter prompt. Type \"help\" to get a list of commands.\n";
-    list ();
+    print STDERR
+      "Enter prompt. Type \"help\" to get a list of commands.\n";
+    list();
 
     my $p = "(umph) ";
 
-    while (not $done) {
+    while ( not $done ) {
 
         print STDERR $p;
 
@@ -211,30 +216,26 @@ sub prompt {
         next unless $ln;
         chomp $ln;
 
-        if ( $ln =~ /(\d+)/ )
-            { toggle_number ($1); }
+        if ( $ln =~ /(\d+)/ ) { toggle_number($1); }
 
         else {
             next if $ln !~ /(\w)/;
-            $cmds{$1} ()  if defined $cmds{$1};
+            $cmds{$1}() if defined $cmds{$1};
         }
-
     }
-
 }
 
 sub toggle_number {
     my $i = (shift) - 1;
-    if ($i >= 0 && exists $entries[$i]) {
+    if ( $i >= 0 && exists $entries[$i] ) {
         $entries[$i]->{selected} = not $entries[$i]->{selected};
-        list ();
+        list();
     }
-    else
-        { printf STDERR "error: out of range\n"; }
+    else { printf STDERR "error: out of range\n"; }
 }
 
 sub help {
-    print STDERR "Commands:
+    print STDERR qq/Commands:
   help      .. this
   list      .. list found videos (> indicates selected)
   all       .. select all videos
@@ -243,34 +244,33 @@ sub help {
   (number)  .. toggle (select, unselect) video, see list output
   dump      .. dump selected video urls to stdout and exit
   quit      .. terminate program
-Command name abbreviations are allowed, e.g. \"a\" instead of \"all\".
-";
+Command name abbreviations are allowed, e.g. "a" instead of "all".
+/;
 }
 
 sub list {
     my $i = 0;
     foreach (@entries) {
-        printf STDERR "%2s%02d: $_->{title}\n",
-            $_->{selected}
-                ? ">"
-                : "",
-            ++$i;
+        printf STDERR "%2s%02d: $_->{title}\n", $_->{selected}
+          ? ">"
+          : "",
+          ++$i;
     }
 }
 
 sub select_all {
     $_->{selected} = 1 foreach @entries;
-    list ();
+    list();
 }
 
 sub select_none {
     $_->{selected} = 0 foreach @entries;
-    list ();
+    list();
 }
 
 sub revert_selection {
-    $_->{selected} = not $_->{selected}  foreach @entries;
-    list ();
+    $_->{selected} = not $_->{selected} foreach @entries;
+    list();
 }
 
 sub quit { exit 0; }
@@ -279,209 +279,27 @@ sub dump { $done = 1; }
 
 __END__
 
-=head1 NAME
-
-umph - Command line tool for parsing video links from Youtube feeds
-
 =head1 SYNOPSIS
 
 umph [-q] [-i] [--csv | --json] [-t E<lt>typeE<gt>]
     [--proxy E<lt>addrE<gt> | --no-proxy]
     [E<lt>playlist_idE<gt> | E<lt>usernameE<gt>]
 
-=head1 DESCRIPTION
-
-umph is a command line tool for parsing video links from Youtube feeds,
-such as playlists, favorites and uploads. The parsed video links are
-printed to the standard output each separated with a newline.
-
-If you need to select the videos, use the C<--interactive> switch.
-
 =head1 OPTIONS
 
-     --help                     print help and exit
-     --version                  print version and exit
-     --license                  print license and exit
- -q, --quiet                    be quiet
- -i, --interactive              run in interactive mode
- -t, --type arg (=p)            get feed type
- -s, --start-index arg (=1)     index of first matching result
- -m, --max-results arg (=25)    max number of results included
-     --json                     print details in json
-     --csv                      print details in csv
-     --proxy arg (=http_proxy)  use proxy for http connections
-     --no-proxy                 disable use of http proxy
-
-=head1 OPTION DESCRIPTIONS
-
-=over 4
-
-=item B<-h, --help>
-
-Print help and exit.
-
-=item B<-v, --version>
-
-Print version and exit.
-
-=item B<--license>
-
-Print license and exit.
-
-=item B<-q, --quiet>
-
-Be quiet.
-
-=item B<-t, --type>=I<arg>
-
-Specifies the feed type to get. I<arg> can be one of the following:
-
-  p, playlist  (arg0 will be treated as playlist ID)
-  f, favorites (arg0 will be treated as username)
-  u, uploads   (same)
-
-Default is "p" (playlist). See also L</EXAMPLES>.
-
-=item B<-s, --start-index>=I<arg>
-
-"The start-index parameter specifies the index of the first matching result
-that should be included in the result set. This parameter uses a one-based
-index, meaning the first result is 1, the second result is 2 and so forth.
-
-This parameter works in conjunction with the C<--max-results> parameter to
-determine which results to return. For example, to request the second set
-of 10 results, i.e. results 11-20, set the start-index parameter to 11
-and the max-results parameter to 10."
-
-  <http://code.google.com/apis/youtube/2.0/reference.html#start-indexsp>
-
-umph defaults to 1.
-
-=item B<-m, --max-results>=I<arg>
-
-"The max-results parameter specifies the maximum number of results that
-should be included in the result set.
-
-This parameter works in conjunction with the C<--start-index>  parameter
-to determine which results to return. For example, to request the second
-set of 10 results, i.e. results 11-20, set the max-results parameter
-to 10 and the start-index parameter to 11.
-
-The default value of this parameter is 25, and the maximum value is 50.
-However, for displaying lists of videos, we recommend that you set the
-max-results parameter to 10."
-
-  <http://code.google.com/apis/youtube/2.0/reference.html#max-resultssp>
-
-umph defaults to 25.
-
-=item B<-i, --interactive>
-
-Enable interactive prompt which can be used to select the videos from the
-feed. By default umph selects all of the feed items.
-
-=item B<--json>
-
-Print details in JSON. Negates --csv.
-
-=item B<--csv>
-
-Print details in CSV ("$title","$url"\n).
-
-=item B<--proxy> I<arg>
-
-Use I<arg> for HTTP proxy, e.g. "http://foo:1234". Overrides the http_proxy
-environment setting.
-
-=item B<--no-proxy>
-
-Disable use of HTTP proxy. Overrides both C<--proxy> and http_proxy environment
-settings.
-
-=back
-
-=head1 EXAMPLES
-
-=over 4
-
-=item umph AAF3A1D0CA1E304F
-
-Fetch and parse playlist "AAF3A1D0CA1E304F".
-
-=item umph --json AAF3A1D0CA1E304F
-
-Same as above, but print the details in JSON.
-
-=item umph -s 11 -m 10 AAF3A1D0CA1E304F
-
-Same as above but get the items 11-20 from the playlist.
-
-=item umph -t f youtube
-
-Fetch and parse favorites for user "youtube".
-
-=item umph -t u youtube
-
-Fetch and parse uploads for user "youtube".
-
-=item umph AAF3A1D0CA1E304F | cclive -f sd_270p
-
-Print the parsed playlist items (links) to stdout, use C<cclive(1)>
-to download them.
-
-=back
-
-=head1 EXIT STATUS
-
-Exits 0 on success, otherwise 1.
-
-=head1 FILES
-
-=over 4
-
-=item $HOME/.umphrc, for example:
-
-echo "--interactive" >> ~/.umphrc
-
-=back
-
-=head1 NOTES
-
-=over 4
-
-=item B<http_proxy>
-
-umph depends on XML::DOM which uses LWP::UserAgent to fetch the data
-over the network. LWP::UserAgent reads the http_proxy environment
-setting. e.g.:
-
-    env http_proxy=http://foo:1234 umph AAF3A1D0CA1E304F
-
-=item B<Unavailable feeds>
-
-Some feeds may have been set private by the Youtube users. umph
-cannot currently fetch and parse those.
-
-=item B<Project>
-
-<http://umph.googlecode.com/>
-
-=item B<Development repository>
-
-<git://repo.or.cz/umph.git>
-
-e.g. git clone git://repo.or.cz/umph.git
-
-=back
-
-=head1 SEE ALSO
-
-C<cclive(1)> C<clive(1)>
-
-=head1 AUTHOR
-
-Toni Gundogdu <legatvs at sign gmail com>
+     --help                     Print help and exit
+     --version                  Print version and exit
+     --license                  Print license and exit
+ -q, --quiet                    Be quiet
+ -i, --interactive              Run in interactive mode
+ -t, --type arg (=p)            Get feed type
+ -s, --start-index arg (=1)     Index of first matching result
+ -m, --max-results arg (=25)    Max number of results included
+     --json                     Print details in JSON
+     --csv                      Print details in CSV
+     --proxy arg (=http_proxy)  Use proxy for HTTP connections
+     --no-proxy                 Disable use of HTTP proxy
 
 =cut
 
-
+# vim: set ts=4 sw=4 tw=72 expandtab:
