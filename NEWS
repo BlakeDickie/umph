@@ -1,0 +1,6 @@
+
+0.1.8  Thu Mar 03 2011  Toni Gundogdu
+Changes:
+        - Add man1/umph.1.pod (move POD from bin/umph)
+
+See ChangeLog.pre-gitlog for earlier release notes.
