@@ -1,0 +1,29 @@
+
+
+PREREQUISITES
+
+  * Getopt::ArgvFile    <http://search.cpan.org/perldoc?Getopt::ArgvFile>
+  * XML::DOM            <http://search.cpan.org/perldoc?XML::DOM>
+
+Additionally, to install:
+  * ExtUtils::MakeMaker <http://search.cpan.org/perldoc?ExtUtils::MakeMaker>
+
+
+INSTALLATION
+
+  * Uninstall earlier versions of umph if you have any installed
+
+To install:
+
+  perl Makefile.PL
+  make
+  make install
+
+  * Note that you can specify install prefix with INSTALL_BASE
+    e.g. perl Makefile.PL INSTALL_BASE=/usr/local
+
+Recommended reading if you are new to ExtUtils::MakeMaker:
+  * <http://search.cpan.org/perldoc?ExtUtils::MakeMaker>
+  * <http://perldoc.perl.org/ExtUtils/MakeMaker/FAQ.html>
+
+# vim: set ts=2 sw=2 tw=72 expandtab:

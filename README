@@ -1,40 +1,21 @@
 
 
-    In brief
+GENERAL
 
-umph is a command line tool for parsing video links from Youtube feeds,
-such as playlists, favorites and uploads. The parsed video links are
-printed to the standard output each separated with a newline.
+umph is a command line tool for parsing YouTube feeds. It can parse
+playlists, favorite lists, and user upload lists.
 
-WWW: <http://umph.googlecode.com/>
-GIT: <git://repo.or.cz/umph.git>
+umph prints the found URLs to the standard output, each URL separated
+with a newline. It can be used to select the feed items using the
+--interactive prompt.
 
-
-PREREQUISITES
-
-See the Makefile.PL file.
+Home  : <http://umph.googlecode.com/>
+gitweb: <git://repo.or.cz/w/umph.git>
 
 
-INSTALLATION
+LICENSE
 
-You can skip this step, if you like, and instead just run "bin/umph".
-This should work as long as the prerequisites are found.
-
-If you choose to install:
-
-    * Highly recommended
-        - Remove / uninstall any earlier version you have installed
-
-    * You can specify install prefix with INSTALL_BASE
-        e.g. perl Makefile.PL INSTALL_BASE=/usr/local
-
-To install:
-
-    perl Makefile.PL
-    make
-    make install
-
-  More: <http://search.cpan.org/perldoc?ExtUtils::MakeMaker>
-   FAQ: <http://perldoc.perl.org/ExtUtils/MakeMaker/FAQ.html>
+umph is free software, licensed under the GPLv3+.
 
 
+vim: set ts=2 sw=2 tw=72 expandtab:
