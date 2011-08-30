@@ -1,21 +1,22 @@
 
 =head1 NAME
 
-umph - Command line tool for parsing video links from Youtube feeds
+umph - Command line tool for parsing YouTube feeds
 
 =head1 SYNOPSIS
 
-umph [-q] [-i] [--csv | --json] [-t E<lt>typeE<gt>]
-    [--proxy E<lt>addrE<gt> | --no-proxy]
-    [E<lt>playlist_idE<gt> | E<lt>usernameE<gt>]
+umph [-q] [-i] [-a] [--csv | --json] [-t E<lt>typeE<gt>]
+     [--proxy E<lt>addrE<gt>| --no-proxy]
+     [E<lt>playlist_idE<gt> | E<lt>usernameE<gt>]
 
 =head1 DESCRIPTION
 
-umph is a command line tool for parsing video links from Youtube feeds,
-such as playlists, favorites and uploads. The parsed video links are
-printed to the standard output each separated with a newline.
+umph is a command line tool for parsing YouTube feeds. It can parse
+playlists, favorite lists, and user upload lists.
 
-If you need to select the videos, use the C<--interactive> switch.
+umph prints the found URLs to the standard output, each URL separated
+with a newline. It can be used to select the feed items using the
+C<--interactive> prompt.
 
 =head1 OPTIONS
 
@@ -31,19 +32,20 @@ Print version and exit.
 
 =item B<-q, --quiet>
 
-Be quiet.
+Turn off output to stderr, e.g. status changes. Warnings and errors are
+still printed.
 
-=item B<-t, --type>=I<arg>
+=item B<-t, --type> I<arg> (=p)
 
 Specifies the feed type to get. I<arg> can be one of the following:
 
-  p, playlist  (arg0 will be treated as playlist ID)
-  f, favorites (arg0 will be treated as username)
-  u, uploads   (same)
+ p, playlist  (arg0 will be treated as playlist ID)
+ f, favorites (arg0 will be treated as username)
+ u, uploads   (ditto)
 
-Default is "p" (playlist). See also L</EXAMPLES>.
+See also L</EXAMPLES>.
 
-=item B<-s, --start-index>=I<arg>
+=item B<-s, --start-index> I<arg> (=1)
 
 "The start-index parameter specifies the index of the first matching result
 that should be included in the result set. This parameter uses a one-based
@@ -52,13 +54,11 @@ index, meaning the first result is 1, the second result is 2 and so forth.
 This parameter works in conjunction with the C<--max-results> parameter to
 determine which results to return. For example, to request the second set
 of 10 results, i.e. results 11-20, set the start-index parameter to 11
-and the max-results parameter to 10."
+and the max-results parameter to 10." -- E<lt>http://is.gd/l4wDNfE<gt>
 
-  <http://code.google.com/apis/youtube/2.0/reference.html#start-indexsp>
+C<--all> causes umph to ignore the value set with this option.
 
-umph defaults to 1.
-
-=item B<-m, --max-results>=I<arg>
+=item B<-m, --max-results> I<arg> (=25)
 
 "The max-results parameter specifies the maximum number of results that
 should be included in the result set.
@@ -70,16 +70,18 @@ to 10 and the start-index parameter to 11.
 
 The default value of this parameter is 25, and the maximum value is 50.
 However, for displaying lists of videos, we recommend that you set the
-max-results parameter to 10."
+max-results parameter to 10." -- E<lt>http://is.gd/OcSjwUE<gt>
 
-  <http://code.google.com/apis/youtube/2.0/reference.html#max-resultssp>
+C<--all> causes umph to ignore the value set with this option.
 
-umph defaults to 25.
+=item B<-a, --all>
+
+Get all feed items.
 
 =item B<-i, --interactive>
 
-Enable interactive prompt which can be used to select the videos from the
-feed. By default umph selects all of the feed items.
+Use interactive prompt which can be used to select the feed items.
++umph selects I<all> feed items by default.
 
 =item B<--json>
 
@@ -103,34 +105,35 @@ settings.
 
 =head1 EXAMPLES
 
-=over 4
+=head2 umph AAF3A1D0CA1E304F
 
-=item umph AAF3A1D0CA1E304F
+Get playlist "AAF3A1D0CA1E304F".
 
-Fetch and parse playlist "AAF3A1D0CA1E304F".
-
-=item umph --json AAF3A1D0CA1E304F
+=head2 umph --json AAF3A1D0CA1E304F
 
 Same as above, but print the details in JSON.
 
-=item umph -s 11 -m 10 AAF3A1D0CA1E304F
+=head2 umph -s 11 -m 10 AAF3A1D0CA1E304F
 
 Same as above but get the items 11-20 from the playlist.
 
-=item umph -t f youtube
+=head2 umph -a AAF3A1D0CA1E304F
 
-Fetch and parse favorites for user "youtube".
+Similar but get I<all> of the items in the playlist. By default, umph gets
+only the items 1-25 from the list. See also C<--start-index> and
+C<--max-results>.
 
-=item umph -t u youtube
+=head2 umph -t f foo
 
-Fetch and parse uploads for user "youtube".
+Get favorites for user "foo".
 
-=item umph AAF3A1D0CA1E304F | cclive -f mp4_360p
+=head2 umph -t u foo
 
-Print the parsed playlist items (links) to stdout, use C<cclive(1)>
-to download them.
+Get uploads for user "foo".
 
-=back
+=head2 umph AAF3A1D0CA1E304F | cclive
+
+Download the found items with C<cclive(1)>.
 
 =head1 EXIT STATUS
 
@@ -138,13 +141,11 @@ Exits 0 on success, otherwise 1.
 
 =head1 FILES
 
-=over 4
+=head2 ~/.umphrc
 
-=item $HOME/.umphrc, for example:
+=head3 Example:
 
-echo "--interactive" >> ~/.umphrc
-
-=back
+ echo "--interactive" >> ~/.umphrc
 
 =head1 NOTES
 
@@ -156,20 +157,22 @@ umph depends on XML::DOM which uses LWP::UserAgent to fetch the data
 over the network. LWP::UserAgent reads the http_proxy environment
 setting. e.g.:
 
-    env http_proxy=http://foo:1234 umph AAF3A1D0CA1E304F
+ env http_proxy=http://foo:1234 umph AAF3A1D0CA1E304F
 
 =item B<Unavailable feeds>
 
-Some feeds may have been set private by the Youtube users. umph
-cannot currently fetch and parse those.
+umph cannot parse "private" lists.
 
 =back
 
 =head1 WWW
 
-E<lt>http://umph.googlecode.com/E<gt>
+ Home  : <http://umph.googlecode.com/>
+ gitweb: <http://repo.or.cz/w/umph.git>
 
-E<lt>http://repo.or.cz/w/umph.gitE<gt>
+=head1 LICENSE
+
+umph is free software, licensed under the GPLv3+.
 
 =head1 SEE ALSO
 
@@ -177,4 +180,4 @@ C<cclive(1)>
 
 =head1 AUTHOR
 
-Toni Gundogdu <legatvs at sign gmail com>
+Toni Gundogdu <legatvs at sign cpan org>
