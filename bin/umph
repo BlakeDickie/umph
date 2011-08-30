@@ -71,6 +71,7 @@ sub init
              'start_index|start-index|s=i',
              'max_results|max-results|m=i',
              'interactive|i',
+             'all|a',
              'json',
              'csv',
              'proxy=s',
@@ -105,21 +106,28 @@ sub main
   $a->no_proxy('') if $config{no_proxy};
 
   require XML::DOM;
+  my $p = new XML::DOM::Parser(LWP_UserAgent => $a);
+  my $s = $config{start_index};
+  my $m = $config{all} ? MAX_RESULTS_LIMIT : $config{max_results};
 
-  my $p    = new XML::DOM::Parser(LWP_UserAgent => $a);
-  my $doc  = $p->parsefile(from_arg($ARGV[0]));
-  my $root = $doc->getDocumentElement;
-
-  my $n = 0;
-  for my $entry ($root->getElementsByTagName("entry"))
+  while (1)
   {
-    my $t = to_item($entry, "title")->getFirstChild->getNodeValue;
-    my $l = to_item($entry, "link")->getAttributeNode("href")->getValue;
-    my %data = (title => $t, url => $l, selected => 1);
-    push @items, \%data;
-    spew_qe((++$n % 9 == 0) ? " " : ".");
+    my $doc  = $p->parsefile(from_arg($ARGV[0], $s, $m));
+    my $root = $doc->getDocumentElement;
+    my $n    = 0;
+    for my $entry ($root->getElementsByTagName("entry"))
+    {
+      my $t = to_item($entry, "title")->getFirstChild->getNodeValue;
+      my $l = to_item($entry, "link")->getAttributeNode("href")->getValue;
+      my %data = (title => $t, url => $l, selected => 1);
+      push @items, \%data;
+      spew_qe((++$n % 5 == 0) ? " " : ".");
+      ++$s;
+    }
+    $doc->dispose;
+
+    last if $n == 0 or not $config{all};
   }
-  $doc->dispose;
 
   spew_qe "done.\n";
 
@@ -161,8 +169,9 @@ use constant GURL => "http://gdata.youtube.com/feeds/api";
 
 sub from_arg
 {
-  my ($arg0, $u) = @_;
+  my ($arg0, $s, $m) = @_;
 
+  my $u;
   if ($config{type} eq "u" or $config{type} eq "uploads")
   {
     $u = GURL . "/users/$arg0/uploads?v=2";
@@ -176,9 +185,8 @@ sub from_arg
     $u = GURL . "/playlists/$arg0?v=2";
   }
 
-  $u .= "&start-index=$config{start_index}";
-  $u .= "&max-results=$config{max_results}";
-  $u;
+  $u .= "&start-index=$s";
+  $u .= "&max-results=$m";
 }
 
 sub to_item
@@ -295,6 +303,7 @@ umph [-q] [-i] [--csv | --json] [-t E<lt>typeE<gt>]
  -t, --type arg (=p)            Get feed type
  -s, --start-index arg (=1)     Index of first matching result
  -m, --max-results arg (=25)    Max number of results included
+ -a, --all                      Get all items
      --json                     Print details in JSON
      --csv                      Print details in CSV
      --proxy arg (=http_proxy)  Use proxy for HTTP connections
