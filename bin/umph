@@ -67,8 +67,8 @@ sub init
   GetOptions(
              \%config,
              'type|t=s',
-             'start_index|start-index|s=s',
-             'max_results|max-results|m=s',
+             'start_index|start-index|s=i',
+             'max_results|max-results|m=i',
              'interactive|i',
              'json',
              'csv',
