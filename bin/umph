@@ -26,8 +26,8 @@ binmode STDERR, ":utf8";
 
 use version 0.77 (); our $VERSION = version->declare("0.1.9");
 
-use Getopt::ArgvFile (home => 1, startupFilename => [qw(.umphrc)]);
-use Getopt::Long qw (:config bundling);
+use Getopt::ArgvFile(home => 1, startupFilename => [qw(.umphrc)]);
+use Getopt::Long qw(:config bundling);
 
 my %config;
 my @entries;
@@ -90,20 +90,18 @@ sub print_help
   Pod::Usage::pod2usage(-exitstatus => 0, -verbose => 1);
 }
 
+sub spew_qe {print STDERR @_ unless $config{quiet}}
+sub spew_e {print STDERR @_}
+
 sub main
 {
   init();
-
   print_help if scalar @ARGV == 0;
-
-  print STDERR "Checking ..." unless $config{quiet};
+  spew_qe("Checking ...");
 
   require LWP;
-
   my $a = new LWP::UserAgent;
-
   $a->env_proxy;    # http://search.cpan.org/perldoc?LWP::UserAgent
-
   $a->proxy('http', $config{proxy}) if $config{proxy};
   $a->no_proxy('') if $config{no_proxy};
 
@@ -115,38 +113,29 @@ sub main
 
   for my $entry ($root->getElementsByTagName("entry"))
   {
-
-    my $title = to_item($entry, "title")->getFirstChild->getNodeValue;
-
-    my $link =
-      to_item($entry, "link")->getAttributeNode("href")->getValue;
-
-    my %data = (title => $title, url => $link, selected => 1);
-
+    my $t = to_item($entry, "title")->getFirstChild->getNodeValue;
+    my $l = to_item($entry, "link")->getAttributeNode("href")->getValue;
+    my %data = (title => $t, url => $l, selected => 1);
     push @entries, \%data;
-
-    print STDERR "." unless $config{quiet};
+    spew_qe "." unless $config{quiet};
   }
-
-  print STDERR "done.\n" unless $config{quiet};
-
   $doc->dispose;
 
-  print STDERR "error: nothing found.\n" and return 1
+  spew_qe "done.\n" unless $config{quiet};
+
+  spew_e "error: nothing found.\n" and return 1
     unless scalar @entries;
 
   prompt() if $config{interactive};
 
-  if ($config{json}) {print qq/{\n  "video": [\n/;}
+  if ($config{json}) {print qq/{\n  "video": [\n/}
 
   my $i = 0;
 
   foreach (@entries)
   {
-
     if ($_->{selected} or not $config{interactive})
     {
-
       ++$i;
 
       my $t = $_->{title} || "";
@@ -160,16 +149,13 @@ sub main
           . qq/      "url": "$_->{url}"\n/ . "    }",
           ;
       }
-
-      elsif ($config{csv}) {print qq/"$t","$_->{url}"\n/;}
-
-      else {print "$_->{url}\n";}
+      elsif ($config{csv}) {print qq/"$t","$_->{url}"\n/}
+      else                 {print "$_->{url}\n"}
     }
   }
 
-  if ($config{json}) {print "\n  ]\n}\n";}
-
-  return 0;
+  if ($config{json}) {print "\n  ]\n}\n"}
+  0;
 }
 
 sub from_arg
@@ -193,46 +179,41 @@ sub from_arg
 
   $u .= "&start-index=$config{start_index}";
   $u .= "&max-results=$config{max_results}";
-
-  return $u;
+  $u;
 }
 
 sub to_item
 {
   my ($entry, $name) = @_;
-  return $entry->getElementsByTagName($name)->item(0);
+  $entry->getElementsByTagName($name)->item(0);
 }
 
 sub prompt
 {
   my %cmds = (
               'h' => \&help,
-              'q' => \&quit,
+              'q' => sub {exit 0},
+              'd' => sub {$done = 1},
               'l' => \&list,
-              'd' => \&dump,
               'a' => \&select_all,
               'n' => \&select_none,
               'r' => \&revert_selection,
              );
 
-  print STDERR
-    "Enter prompt. Type \"help\" to get a list of commands.\n";
+  spew_e qq/Enter prompt. Type "help" to get a list of commands.\n/;
   list();
 
-  my $p = "(umph) ";
+  use constant P => "(umph) ";
 
   while (not $done)
   {
-
-    print STDERR $p;
+    spew_e P;
 
     my $ln = <STDIN>;
-
     next unless $ln;
     chomp $ln;
 
-    if ($ln =~ /(\d+)/) {toggle_number($1);}
-
+    if ($ln =~ /(\d+)/) {toggle_number($1)}
     else
     {
       next if $ln !~ /(\w)/;
@@ -249,12 +230,12 @@ sub toggle_number
     $entries[$i]->{selected} = not $entries[$i]->{selected};
     list();
   }
-  else {printf STDERR "error: out of range\n";}
+  else {spew_e "error: out of range\n"}
 }
 
 sub help
 {
-  print STDERR qq/Commands:
+  spew_e qq/Commands:
   help      .. this
   list      .. list found videos (> indicates selected)
   all       .. select all videos
@@ -297,17 +278,13 @@ sub revert_selection
   list();
 }
 
-sub quit {exit 0;}
-
-sub dump {$done = 1;}
-
 __END__
 
 =head1 SYNOPSIS
 
 umph [-q] [-i] [--csv | --json] [-t E<lt>typeE<gt>]
-    [--proxy E<lt>addrE<gt> | --no-proxy]
-    [E<lt>playlist_idE<gt> | E<lt>usernameE<gt>]
+     [--proxy E<lt>addrE<gt> | --no-proxy]
+     [E<lt>playlist_idE<gt> | E<lt>usernameE<gt>]
 
 =head1 OPTIONS
 
