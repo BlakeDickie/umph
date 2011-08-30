@@ -32,7 +32,26 @@ use Getopt::Long qw(:config bundling);
 
 exit main();
 
+sub print_help
+{
+  require Pod::Usage;
+  Pod::Usage::pod2usage(-exitstatus => 0, -verbose => 1);
+}
+
+use constant MAX_RESULTS_LIMIT => 50;    # Refer to http://is.gd/OcSjwU
 my %config;
+
+sub check_max_results_value
+{
+  if ($config{max_results} > MAX_RESULTS_LIMIT)
+  {
+    say STDERR
+      "WARNING --max-results exceeds max. accepted value, using "
+      . MAX_RESULTS_LIMIT
+      . " instead";
+    $config{max_results} = MAX_RESULTS_LIMIT;
+  }
+}
 
 sub init
 {
@@ -48,18 +67,16 @@ sub init
              'no_proxy|no-proxy',
              'quiet|q',
              'version' => sub {say "umph version $VERSION"; exit 0},
-             'help'    => \&print_help,
+             'help' => \&print_help,
             ) or exit 1;
+
+  print_help if scalar @ARGV == 0;
 
   $config{type}        ||= 'p';    # Default to "playlist".
   $config{start_index} ||= 1;      # Default to 1.
   $config{max_results} ||= 25;     # Default 25.
-}
 
-sub print_help
-{
-  require Pod::Usage;
-  Pod::Usage::pod2usage(-exitstatus => 0, -verbose => 1);
+  check_max_results_value;
 }
 
 sub spew_qe {print STDERR @_ unless $config{quiet}}
@@ -69,7 +86,6 @@ my @items;
 sub main
 {
   init;
-  print_help if scalar @ARGV == 0;
   spew_qe "Checking ... ";
 
   require LWP;
@@ -276,4 +292,4 @@ umph [-q] [-i] [--csv | --json] [-t E<lt>typeE<gt>]
 
 =cut
 
-# vim: set ts=4 sw=4 tw=72 expandtab:
+# vim: set ts=2 sw=2 tw=72 expandtab:
