@@ -20,6 +20,7 @@
 
 use warnings;
 use strict;
+use v5.10;
 
 binmode STDOUT, ":utf8";
 binmode STDERR, ":utf8";
