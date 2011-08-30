@@ -122,7 +122,7 @@ sub main
 
   prompt() if $config{interactive};
 
-  if ($config{json}) {print qq/{\n  "video": [\n/}
+  say qq/{\n  "video": [/ if $config{json};
 
   my $i = 0;
 
@@ -137,38 +137,38 @@ sub main
 
       if ($config{json})
       {
-        print ",\n" if $i > 1;
-        print "    {\n"
-          . qq/      "title": "$t",\n/
-          . qq/      "url": "$_->{url}"\n/ . "    }",
-          ;
+        say "," if $i > 1;
+        say "    {";
+        say qq/      "title": "$t",/;
+        say qq/      "url": "$_->{url}"/;
+        print "    }";
       }
-      elsif ($config{csv}) {print qq/"$t","$_->{url}"\n/}
-      else                 {print "$_->{url}\n"}
+      elsif ($config{csv}) {say qq/"$t","$_->{url}"/}
+      else                 {say "$_->{url}"}
     }
   }
 
-  if ($config{json}) {print "\n  ]\n}\n"}
+  say "\n  ]\n}" if $config{json};
   0;
 }
+
+use constant GURL => "http://gdata.youtube.com/feeds/api";
 
 sub from_arg
 {
   my ($arg0, $u) = @_;
 
-  my $c = "http://gdata.youtube.com/feeds/api";
-
   if ($config{type} eq "u" or $config{type} eq "uploads")
   {
-    $u = "$c/users/$arg0/uploads?v=2";
+    $u = GURL . "/users/$arg0/uploads?v=2";
   }
   elsif ($config{type} eq "f" or $config{type} eq "favorites")
   {
-    $u = "$c/users/$arg0/favorites?v=2";
+    $u = GURL . "/users/$arg0/favorites?v=2";
   }
   else
   {
-    $u = "$c/playlists/$arg0?v=2";
+    $u = GURL . "/playlists/$arg0?v=2";
   }
 
   $u .= "&start-index=$config{start_index}";
