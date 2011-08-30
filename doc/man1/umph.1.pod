@@ -29,10 +29,6 @@ Print help and exit.
 
 Print version and exit.
 
-=item B<--license>
-
-Print license and exit.
-
 =item B<-q, --quiet>
 
 Be quiet.

@@ -48,33 +48,12 @@ sub init
              'no_proxy|no-proxy',
              'quiet|q',
              'version' => sub {say "umph version $VERSION"; exit 0},
-             'license' => \&print_license,
              'help'    => \&print_help,
             ) or exit 1;
 
   $config{type}        ||= 'p';    # Default to "playlist".
   $config{start_index} ||= 1;      # Default to 1.
   $config{max_results} ||= 25;     # Default 25.
-}
-
-sub print_license
-{
-  print "# Copyright (C) 2010-2011  Toni Gundogdu.
-#
-# This program is free software: you can redistribute it and/or modify
-# it under the terms of the GNU General Public License as published by
-# the Free Software Foundation, either version 3 of the License, or
-# (at your option) any later version.
-#
-# This program is distributed in the hope that it will be useful,
-# but WITHOUT ANY WARRANTY; without even the implied warranty of
-# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-# GNU General Public License for more details.
-#
-# You should have received a copy of the GNU General Public License
-# along with this program.  If not, see <http://www.gnu.org/licenses/>.
-";
-  exit 0;
 }
 
 sub print_help
@@ -285,7 +264,6 @@ umph [-q] [-i] [--csv | --json] [-t E<lt>typeE<gt>]
 
      --help                     Print help and exit
      --version                  Print version and exit
-     --license                  Print license and exit
  -q, --quiet                    Be quiet
  -i, --interactive              Run in interactive mode
  -t, --type arg (=p)            Get feed type
