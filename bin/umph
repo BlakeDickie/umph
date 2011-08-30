@@ -84,15 +84,14 @@ sub print_help
 }
 
 sub spew_qe {print STDERR @_ unless $config{quiet}}
-sub spew_e {print STDERR @_}
 
 my @items;
 
 sub main
 {
-  init();
+  init;
   print_help if scalar @ARGV == 0;
-  spew_qe("Checking ... ");
+  spew_qe "Checking ... ";
 
   require LWP;
   my $a = new LWP::UserAgent;
@@ -112,13 +111,13 @@ sub main
     my $l = to_item($entry, "link")->getAttributeNode("href")->getValue;
     my %data = (title => $t, url => $l, selected => 1);
     push @items, \%data;
-    spew_qe "." unless $config{quiet};
+    spew_qe ".";
   }
   $doc->dispose;
 
-  spew_qe "done.\n" unless $config{quiet};
+  spew_qe "done.\n";
 
-  spew_e "error: nothing found.\n" and return 1
+  say STDERR "error: nothing found." and return 1
     unless scalar @items;
 
   prompt() if $config{interactive};
@@ -197,14 +196,14 @@ sub prompt
               'r' => \&revert_selection,
              );
 
-  spew_e qq/Enter prompt. Type "help" to get a list of commands.\n/;
+  say STDERR qq/Enter prompt. Type "help" to get a list of commands./;
   list();
 
   use constant P => "(umph) ";
 
   while (not $done)
   {
-    spew_e P;
+    print STDERR P;
 
     my $ln = <STDIN>;
     next unless $ln;
@@ -227,12 +226,12 @@ sub toggle_number
     $items[$i]->{selected} = not $items[$i]->{selected};
     list();
   }
-  else {spew_e "error: out of range\n"}
+  else {say STDERR "error: out of range"}
 }
 
 sub help
 {
-  spew_e qq/Commands:
+  say STDERR qq/Commands:
   help      .. this
   list      .. list found videos (> indicates selected)
   all       .. select all videos
@@ -241,8 +240,7 @@ sub help
   (number)  .. toggle (select, unselect) video, see list output
   dump      .. dump selected video urls to stdout and exit
   quit      .. terminate program
-Command name abbreviations are allowed, e.g. "a" instead of "all".
-/;
+Command name abbreviations are allowed, e.g. "a" instead of "all"./;
 }
 
 sub list
