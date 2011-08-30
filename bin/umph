@@ -30,11 +30,9 @@ use version 0.77 (); our $VERSION = version->declare("0.1.9");
 use Getopt::ArgvFile(home => 1, startupFilename => [qw(.umphrc)]);
 use Getopt::Long qw(:config bundling);
 
-my %config;
-my @entries;
-my $done = 0;
-
 exit main();
+
+my %config;
 
 sub init
 {
@@ -49,7 +47,7 @@ sub init
              'proxy=s',
              'no_proxy|no-proxy',
              'quiet|q',
-             'version' => sub {print "umph version $VERSION\n"; exit 0},
+             'version' => sub {say "umph version $VERSION"; exit 0},
              'license' => \&print_license,
              'help'    => \&print_help,
             ) or exit 1;
@@ -88,6 +86,8 @@ sub print_help
 sub spew_qe {print STDERR @_ unless $config{quiet}}
 sub spew_e {print STDERR @_}
 
+my @items;
+
 sub main
 {
   init();
@@ -111,7 +111,7 @@ sub main
     my $t = to_item($entry, "title")->getFirstChild->getNodeValue;
     my $l = to_item($entry, "link")->getAttributeNode("href")->getValue;
     my %data = (title => $t, url => $l, selected => 1);
-    push @entries, \%data;
+    push @items, \%data;
     spew_qe "." unless $config{quiet};
   }
   $doc->dispose;
@@ -119,7 +119,7 @@ sub main
   spew_qe "done.\n" unless $config{quiet};
 
   spew_e "error: nothing found.\n" and return 1
-    unless scalar @entries;
+    unless scalar @items;
 
   prompt() if $config{interactive};
 
@@ -127,7 +127,7 @@ sub main
 
   my $i = 0;
 
-  foreach (@entries)
+  foreach (@items)
   {
     if ($_->{selected} or not $config{interactive})
     {
@@ -183,6 +183,8 @@ sub to_item
   $entry->getElementsByTagName($name)->item(0);
 }
 
+my $done = 0;
+
 sub prompt
 {
   my %cmds = (
@@ -220,9 +222,9 @@ sub prompt
 sub toggle_number
 {
   my $i = (shift) - 1;
-  if ($i >= 0 && exists $entries[$i])
+  if ($i >= 0 && exists $items[$i])
   {
-    $entries[$i]->{selected} = not $entries[$i]->{selected};
+    $items[$i]->{selected} = not $items[$i]->{selected};
     list();
   }
   else {spew_e "error: out of range\n"}
@@ -246,7 +248,7 @@ Command name abbreviations are allowed, e.g. "a" instead of "all".
 sub list
 {
   my $i = 0;
-  foreach (@entries)
+  foreach (@items)
   {
     printf STDERR "%2s%02d: $_->{title}\n", $_->{selected}
       ? ">"
@@ -257,19 +259,19 @@ sub list
 
 sub select_all
 {
-  $_->{selected} = 1 foreach @entries;
+  $_->{selected} = 1 foreach @items;
   list();
 }
 
 sub select_none
 {
-  $_->{selected} = 0 foreach @entries;
+  $_->{selected} = 0 foreach @items;
   list();
 }
 
 sub revert_selection
 {
-  $_->{selected} = not $_->{selected} foreach @entries;
+  $_->{selected} = not $_->{selected} foreach @items;
   list();
 }
 
