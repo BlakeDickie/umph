@@ -100,13 +100,14 @@ sub main
   my $doc  = $p->parsefile(from_arg($ARGV[0]));
   my $root = $doc->getDocumentElement;
 
+  my $n = 0;
   for my $entry ($root->getElementsByTagName("entry"))
   {
     my $t = to_item($entry, "title")->getFirstChild->getNodeValue;
     my $l = to_item($entry, "link")->getAttributeNode("href")->getValue;
     my %data = (title => $t, url => $l, selected => 1);
     push @items, \%data;
-    spew_qe ".";
+    spew_qe((++$n % 9 == 0) ? " " : ".");
   }
   $doc->dispose;
 
