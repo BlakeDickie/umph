@@ -2,8 +2,9 @@
 
 PREREQUISITES
 
-  * Getopt::ArgvFile    <http://search.cpan.org/perldoc?Getopt::ArgvFile>
-  * XML::DOM            <http://search.cpan.org/perldoc?XML::DOM>
+  * Perl 5.10.1+      <http://perl.org/>
+  * Getopt::ArgvFile  <http://search.cpan.org/perldoc?Getopt::ArgvFile>
+  * XML::DOM          <http://search.cpan.org/perldoc?XML::DOM>
 
 Additionally, to install:
   * ExtUtils::MakeMaker <http://search.cpan.org/perldoc?ExtUtils::MakeMaker>
