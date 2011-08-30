@@ -29,6 +29,7 @@ use version 0.77 (); our $VERSION = version->declare("0.2.0");
 
 use Getopt::ArgvFile(home => 1, startupFilename => [qw(.umphrc)]);
 use Getopt::Long qw(:config bundling);
+use Carp qw(croak);
 
 exit main();
 
@@ -122,8 +123,7 @@ sub main
 
   spew_qe "done.\n";
 
-  say STDERR "error: nothing found." and return 1
-    unless scalar @items;
+  croak "error: nothing found\n" if scalar @items == 0;
 
   prompt() if $config{interactive};
 
