@@ -277,7 +277,7 @@ umph [-q] [-i] [--csv | --json] [-t E<lt>typeE<gt>]
      [--proxy E<lt>addrE<gt> | --no-proxy]
      [E<lt>playlist_idE<gt> | E<lt>usernameE<gt>]
 
-=head1 OPTIONS
+=head2 OPTIONS
 
      --help                     Print help and exit
      --version                  Print version and exit
