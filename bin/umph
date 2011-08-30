@@ -2,7 +2,7 @@
 # -*- coding: ascii -*-
 
 # umph
-# Copyright (C) 2010,2011  Toni Gundogdu <legatvs@gmail.com>
+# Copyright (C) 2010-2011  Toni Gundogdu <legatvs@gmail.com>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@ binmode STDERR, ":utf8";
 
 use version 0.77 (); our $VERSION = version->declare("0.1.9");
 
-use Getopt::ArgvFile ( home => 1, startupFilename => [qw(.umphrc)] );
+use Getopt::ArgvFile (home => 1, startupFilename => [qw(.umphrc)]);
 use Getopt::Long qw (:config bundling);
 
 my %config;
@@ -35,35 +35,38 @@ my $done = 0;
 
 exit main();
 
-sub init {
-    GetOptions(
-        \%config,
-        'type|t=s',
-        'start_index|start-index|s=s',
-        'max_results|max-results|m=s',
-        'interactive|i',
-        'json',
-        'csv',
-        'proxy=s',
-        'no_proxy|no-proxy',
-        'quiet|q',
-        'version' => \&print_version,
-        'license' => \&print_license,
-        'help'    => \&print_help,
-    ) or exit 1;
+sub init
+{
+  GetOptions(
+             \%config,
+             'type|t=s',
+             'start_index|start-index|s=s',
+             'max_results|max-results|m=s',
+             'interactive|i',
+             'json',
+             'csv',
+             'proxy=s',
+             'no_proxy|no-proxy',
+             'quiet|q',
+             'version' => \&print_version,
+             'license' => \&print_license,
+             'help'    => \&print_help,
+            ) or exit 1;
 
-    $config{type}        ||= 'p';    # Default to "playlist".
-    $config{start_index} ||= 1;      # Default to 1.
-    $config{max_results} ||= 25;     # Default 25.
+  $config{type}        ||= 'p';    # Default to "playlist".
+  $config{start_index} ||= 1;      # Default to 1.
+  $config{max_results} ||= 25;     # Default 25.
 }
 
-sub print_version {
-    print "umph version $VERSION\n";
-    exit 0;
+sub print_version
+{
+  print "umph version $VERSION\n";
+  exit 0;
 }
 
-sub print_license {
-    print "# Copyright (C) 2010,2011  Toni Gundogdu.
+sub print_license
+{
+  print "# Copyright (C) 2010-2011  Toni Gundogdu.
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -78,164 +81,180 @@ sub print_license {
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 ";
-    exit 0;
+  exit 0;
 }
 
-sub print_help {
-    require Pod::Usage;
-    Pod::Usage::pod2usage( -exitstatus => 0, -verbose => 1 );
+sub print_help
+{
+  require Pod::Usage;
+  Pod::Usage::pod2usage(-exitstatus => 0, -verbose => 1);
 }
 
-sub main {
-    init();
+sub main
+{
+  init();
 
-    print_help if scalar @ARGV == 0;
+  print_help if scalar @ARGV == 0;
 
-    print STDERR "Checking ..." unless $config{quiet};
+  print STDERR "Checking ..." unless $config{quiet};
 
-    require LWP;
+  require LWP;
 
-    my $a = new LWP::UserAgent;
+  my $a = new LWP::UserAgent;
 
-    $a->env_proxy;    # http://search.cpan.org/perldoc?LWP::UserAgent
+  $a->env_proxy;    # http://search.cpan.org/perldoc?LWP::UserAgent
 
-    $a->proxy( 'http', $config{proxy} ) if $config{proxy};
-    $a->no_proxy('') if $config{no_proxy};
+  $a->proxy('http', $config{proxy}) if $config{proxy};
+  $a->no_proxy('') if $config{no_proxy};
 
-    require XML::DOM;
+  require XML::DOM;
 
-    my $p    = new XML::DOM::Parser( LWP_UserAgent => $a );
-    my $doc  = $p->parsefile( from_arg( $ARGV[0] ) );
-    my $root = $doc->getDocumentElement;
+  my $p    = new XML::DOM::Parser(LWP_UserAgent => $a);
+  my $doc  = $p->parsefile(from_arg($ARGV[0]));
+  my $root = $doc->getDocumentElement;
 
-    for my $entry ( $root->getElementsByTagName("entry") ) {
+  for my $entry ($root->getElementsByTagName("entry"))
+  {
 
-        my $title =
-          to_item( $entry, "title" )->getFirstChild->getNodeValue;
+    my $title = to_item($entry, "title")->getFirstChild->getNodeValue;
 
-        my $link =
-          to_item( $entry, "link" )->getAttributeNode("href")->getValue;
+    my $link =
+      to_item($entry, "link")->getAttributeNode("href")->getValue;
 
-        my %data = ( title => $title, url => $link, selected => 1 );
+    my %data = (title => $title, url => $link, selected => 1);
 
-        push @entries, \%data;
+    push @entries, \%data;
 
-        print STDERR "." unless $config{quiet};
+    print STDERR "." unless $config{quiet};
+  }
+
+  print STDERR "done.\n" unless $config{quiet};
+
+  $doc->dispose;
+
+  print STDERR "error: nothing found.\n" and return 1
+    unless scalar @entries;
+
+  prompt() if $config{interactive};
+
+  if ($config{json}) {print qq/{\n  "video": [\n/;}
+
+  my $i = 0;
+
+  foreach (@entries)
+  {
+
+    if ($_->{selected} or not $config{interactive})
+    {
+
+      ++$i;
+
+      my $t = $_->{title} || "";
+      $t =~ s/"/\\"/g;
+
+      if ($config{json})
+      {
+        print ",\n" if $i > 1;
+        print "    {\n"
+          . qq/      "title": "$t",\n/
+          . qq/      "url": "$_->{url}"\n/ . "    }",
+          ;
+      }
+
+      elsif ($config{csv}) {print qq/"$t","$_->{url}"\n/;}
+
+      else {print "$_->{url}\n";}
     }
+  }
 
-    print STDERR "done.\n" unless $config{quiet};
+  if ($config{json}) {print "\n  ]\n}\n";}
 
-    $doc->dispose;
-
-    print STDERR "error: nothing found.\n" and return 1
-      unless scalar @entries;
-
-    prompt() if $config{interactive};
-
-    if ( $config{json} ) { print qq/{\n  "video": [\n/; }
-
-    my $i = 0;
-
-    foreach (@entries) {
-
-        if ( $_->{selected} or not $config{interactive} ) {
-
-            ++$i;
-
-            my $t = $_->{title} || "";
-            $t =~ s/"/\\"/g;
-
-            if ( $config{json} ) {
-                print ",\n" if $i > 1;
-                print "    {\n"
-                  . qq/      "title": "$t",\n/
-                  . qq/      "url": "$_->{url}"\n/ . "    }",
-                  ;
-            }
-
-            elsif ( $config{csv} ) { print qq/"$t","$_->{url}"\n/; }
-
-            else { print "$_->{url}\n"; }
-        }
-    }
-
-    if ( $config{json} ) { print "\n  ]\n}\n"; }
-
-    return 0;
+  return 0;
 }
 
-sub from_arg {
-    my ( $arg0, $u ) = @_;
+sub from_arg
+{
+  my ($arg0, $u) = @_;
 
-    my $c = "http://gdata.youtube.com/feeds/api";
+  my $c = "http://gdata.youtube.com/feeds/api";
 
-    if ( $config{type} eq "u" or $config{type} eq "uploads" ) {
-        $u = "$c/users/$arg0/uploads?v=2";
-    }
-    elsif ( $config{type} eq "f" or $config{type} eq "favorites" ) {
-        $u = "$c/users/$arg0/favorites?v=2";
-    }
-    else {
-        $u = "$c/playlists/$arg0?v=2";
-    }
+  if ($config{type} eq "u" or $config{type} eq "uploads")
+  {
+    $u = "$c/users/$arg0/uploads?v=2";
+  }
+  elsif ($config{type} eq "f" or $config{type} eq "favorites")
+  {
+    $u = "$c/users/$arg0/favorites?v=2";
+  }
+  else
+  {
+    $u = "$c/playlists/$arg0?v=2";
+  }
 
-    $u .= "&start-index=$config{start_index}";
-    $u .= "&max-results=$config{max_results}";
+  $u .= "&start-index=$config{start_index}";
+  $u .= "&max-results=$config{max_results}";
 
-    return $u;
+  return $u;
 }
 
-sub to_item {
-    my ( $entry, $name ) = @_;
-    return $entry->getElementsByTagName($name)->item(0);
+sub to_item
+{
+  my ($entry, $name) = @_;
+  return $entry->getElementsByTagName($name)->item(0);
 }
 
-sub prompt {
-    my %cmds = (
-        'h' => \&help,
-        'q' => \&quit,
-        'l' => \&list,
-        'd' => \&dump,
-        'a' => \&select_all,
-        'n' => \&select_none,
-        'r' => \&revert_selection,
-    );
+sub prompt
+{
+  my %cmds = (
+              'h' => \&help,
+              'q' => \&quit,
+              'l' => \&list,
+              'd' => \&dump,
+              'a' => \&select_all,
+              'n' => \&select_none,
+              'r' => \&revert_selection,
+             );
 
-    print STDERR
-      "Enter prompt. Type \"help\" to get a list of commands.\n";
+  print STDERR
+    "Enter prompt. Type \"help\" to get a list of commands.\n";
+  list();
+
+  my $p = "(umph) ";
+
+  while (not $done)
+  {
+
+    print STDERR $p;
+
+    my $ln = <STDIN>;
+
+    next unless $ln;
+    chomp $ln;
+
+    if ($ln =~ /(\d+)/) {toggle_number($1);}
+
+    else
+    {
+      next if $ln !~ /(\w)/;
+      $cmds{$1}() if defined $cmds{$1};
+    }
+  }
+}
+
+sub toggle_number
+{
+  my $i = (shift) - 1;
+  if ($i >= 0 && exists $entries[$i])
+  {
+    $entries[$i]->{selected} = not $entries[$i]->{selected};
     list();
-
-    my $p = "(umph) ";
-
-    while ( not $done ) {
-
-        print STDERR $p;
-
-        my $ln = <STDIN>;
-
-        next unless $ln;
-        chomp $ln;
-
-        if ( $ln =~ /(\d+)/ ) { toggle_number($1); }
-
-        else {
-            next if $ln !~ /(\w)/;
-            $cmds{$1}() if defined $cmds{$1};
-        }
-    }
+  }
+  else {printf STDERR "error: out of range\n";}
 }
 
-sub toggle_number {
-    my $i = (shift) - 1;
-    if ( $i >= 0 && exists $entries[$i] ) {
-        $entries[$i]->{selected} = not $entries[$i]->{selected};
-        list();
-    }
-    else { printf STDERR "error: out of range\n"; }
-}
-
-sub help {
-    print STDERR qq/Commands:
+sub help
+{
+  print STDERR qq/Commands:
   help      .. this
   list      .. list found videos (> indicates selected)
   all       .. select all videos
@@ -248,34 +267,39 @@ Command name abbreviations are allowed, e.g. "a" instead of "all".
 /;
 }
 
-sub list {
-    my $i = 0;
-    foreach (@entries) {
-        printf STDERR "%2s%02d: $_->{title}\n", $_->{selected}
-          ? ">"
-          : "",
-          ++$i;
-    }
+sub list
+{
+  my $i = 0;
+  foreach (@entries)
+  {
+    printf STDERR "%2s%02d: $_->{title}\n", $_->{selected}
+      ? ">"
+      : "",
+      ++$i;
+  }
 }
 
-sub select_all {
-    $_->{selected} = 1 foreach @entries;
-    list();
+sub select_all
+{
+  $_->{selected} = 1 foreach @entries;
+  list();
 }
 
-sub select_none {
-    $_->{selected} = 0 foreach @entries;
-    list();
+sub select_none
+{
+  $_->{selected} = 0 foreach @entries;
+  list();
 }
 
-sub revert_selection {
-    $_->{selected} = not $_->{selected} foreach @entries;
-    list();
+sub revert_selection
+{
+  $_->{selected} = not $_->{selected} foreach @entries;
+  list();
 }
 
-sub quit { exit 0; }
+sub quit {exit 0;}
 
-sub dump { $done = 1; }
+sub dump {$done = 1;}
 
 __END__
 
