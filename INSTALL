@@ -1,18 +1,37 @@
 
 
 PREREQUISITES
+=============
+
+Required
+--------
 
   * Perl 5.10.1+      <http://perl.org/>
   * Getopt::ArgvFile  <http://search.cpan.org/perldoc?Getopt::ArgvFile>
   * XML::DOM          <http://search.cpan.org/perldoc?XML::DOM>
 
+Recommended
+-----------
+
+  * Umph::Prompt      <http://umph.googlecode.com/>
+    for --interactive
+
 Additionally, to install:
+-------------------------
+
   * ExtUtils::MakeMaker <http://search.cpan.org/perldoc?ExtUtils::MakeMaker>
 
 
 INSTALLATION
+============
 
-  * Uninstall earlier versions of umph if you have any installed
+Notes
+-----
+
+Uninstall earlier versions of umph if you have any installed.
+
+Typical installation
+--------------------
 
 To install:
 
@@ -27,4 +46,15 @@ Recommended reading if you are new to ExtUtils::MakeMaker:
   * <http://search.cpan.org/perldoc?ExtUtils::MakeMaker>
   * <http://perldoc.perl.org/ExtUtils/MakeMaker/FAQ.html>
 
-# vim: set ts=2 sw=2 tw=72 expandtab:
+For the lazy
+------------
+
+If you do not want to install umph (and Umph::Prompt),
+here is one way to work around that:
+
+  export PERL5LIB=/path/to/untarred/Umph-Prompt/lib/
+  export PATH=$PATH:/path/to/untarred/umph/bin/
+  (run umph)
+
+
+vim: set ts=2 sw=2 tw=72 expandtab:
