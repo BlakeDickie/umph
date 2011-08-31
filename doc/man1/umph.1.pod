@@ -15,7 +15,7 @@ umph is a command line tool for parsing YouTube feeds. It can parse
 playlists, favorite lists, and user upload lists.
 
 umph prints the found URLs to the standard output, each URL separated
-with a newline. It can be used to select the feed items using the
+with a newline. It can be used to select the feed items by using the
 C<--interactive> prompt.
 
 =head1 OPTIONS
@@ -80,8 +80,8 @@ Get all feed items.
 
 =item B<-i, --interactive>
 
-Use interactive prompt which can be used to select the feed items.
-+umph selects I<all> feed items by default.
+Open the interactive prompt which can be used to select the items.
+umph selects I<all> feed items by default. See also L</INTERACTIVE PROMPT>.
 
 =item B<--json>
 
@@ -89,7 +89,7 @@ Print details in JSON. Negates --csv.
 
 =item B<--csv>
 
-Print details in CSV ("$title","$url"\n).
+Print details in CSV.
 
 =item B<--proxy> I<arg>
 
@@ -98,10 +98,16 @@ environment setting.
 
 =item B<--no-proxy>
 
-Disable use of HTTP proxy. Overrides both C<--proxy> and http_proxy environment
-settings.
+Disable use of HTTP proxy. Overrides both C<--proxy> and http_proxy
+environment settings.
 
 =back
+
+=head1 INTERACTIVE PROMPT
+
+Use the C<--interactive> switch to open the prompt. Note that umph
+uses (as of 0.2.0) the Umph::Prompt module for this. Once the prompt
+opens, type "help" to get a list of commands available to the prompt.
 
 =head1 EXAMPLES
 
