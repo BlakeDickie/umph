@@ -1,6 +1,5 @@
 #!/usr/bin/perl
-# -*- coding: ascii -*-
-
+#
 # umph
 # Copyright (C) 2010-2011  Toni Gundogdu <legatvs@gmail.com>
 #
@@ -18,9 +17,10 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 
+use feature 'say';
+
 use warnings;
 use strict;
-use feature 'say';
 
 binmode STDOUT, ":utf8";
 binmode STDERR, ":utf8";
@@ -63,6 +63,16 @@ sub check_max_results_value
   }
 }
 
+sub check_umph_prompt
+{
+  if ($config{'interactive'} and not eval 'require Umph::Prompt')
+  {
+    say STDERR
+      qq/WARNING Umph::Prompt not found, ignoring --interactive option/;
+    $config{interactive} = 0;
+  }
+}
+
 sub init
 {
   GetOptions(
@@ -88,6 +98,7 @@ sub init
   $config{max_results} ||= 25;     # Default 25.
 
   check_max_results_value;
+  check_umph_prompt;
 }
 
 sub spew_qe {print STDERR @_ unless $config{quiet}}
@@ -118,7 +129,8 @@ sub main
     for my $entry ($root->getElementsByTagName("entry"))
     {
       my $t = to_item($entry, "title")->getFirstChild->getNodeValue;
-      my $l = to_item($entry, "link")->getAttributeNode("href")->getValue;
+      my $l =
+        to_item($entry, "link")->getAttributeNode("href")->getValue;
       my %data = (title => $t, url => $l, selected => 1);
       push @items, \%data;
       spew_qe((++$n % 5 == 0) ? " " : ".");
@@ -133,7 +145,7 @@ sub main
 
   croak "error: nothing found\n" if scalar @items == 0;
 
-  prompt() if $config{interactive};
+  open_prompt() if $config{interactive};
 
   say qq/{\n  "video": [/ if $config{json};
 
@@ -195,95 +207,73 @@ sub to_item
   $entry->getElementsByTagName($name)->item(0);
 }
 
-my $done = 0;
-
-sub prompt
+sub open_prompt
 {
-  my %cmds = (
-              'h' => \&help,
-              'q' => sub {exit 0},
-              'd' => sub {$done = 1},
-              'l' => \&list,
-              'a' => \&select_all,
-              'n' => \&select_none,
-              'r' => \&revert_selection,
-             );
+  my $p = new Umph::Prompt(
+
+    # Commands.
+    commands => {
+      q => sub {
+        my ($p, $args) = @_;
+        $p->exit(\@items, $args);
+      },
+      d => sub {
+        my ($p, $args) = @_;
+        $p->display(\@items, $args);
+      },
+      m => sub {
+        my ($p, $args) = @_;
+        $p->max_shown_items(@{$args});
+      },
+      s => sub {
+        my ($p, $args) = @_;
+        $p->select(\@items, $args);
+      },
+      h => sub {
+        my ($p, $args) = @_;
+        my @a;
+        push @a,
+          {cmd => 'normal', desc => 'print results in default format'};
+        push @a, {cmd => 'json', desc => 'print results in json'};
+        push @a, {cmd => 'csv',  desc => 'print results in csv'};
+        $p->help(\@a);
+      },
+      n => sub {
+        $config{json} = 0;
+        $config{csv}  = 0;
+        say STDERR "=> print in default format";
+      },
+      j => sub {
+        $config{json} = 1;
+        $config{csv}  = 0;
+        say STDERR "=> print in json";
+      },
+      c => sub {
+        $config{json} = 0;
+        $config{csv}  = 1;
+        say STDERR "=> print in csv";
+      },
+    },
+
+    # Callbacks. All of these are optional.
+    ontoggle => sub {
+      my ($p, $args) = @_;
+      $p->toggle(\@items, $args);
+    },
+    onitems  => sub {return \@items},
+    onloaded => sub {
+      my ($p, $args) = @_;
+      $p->display(\@items, $args);
+    },
+
+    # Other (required) settings
+    total_items     => scalar @items,
+    prompt_msg      => 'umph',
+    max_shown_items => 20
+  );
 
   say STDERR qq/Enter prompt. Type "help" to get a list of commands./;
-  list();
-
-  use constant P => "(umph) ";
-
-  while (not $done)
-  {
-    print STDERR P;
-
-    my $ln = <STDIN>;
-    next unless $ln;
-    chomp $ln;
-
-    if ($ln =~ /(\d+)/) {toggle_number($1)}
-    else
-    {
-      next if $ln !~ /(\w)/;
-      $cmds{$1}() if defined $cmds{$1};
-    }
-  }
-}
-
-sub toggle_number
-{
-  my $i = (shift) - 1;
-  if ($i >= 0 && exists $items[$i])
-  {
-    $items[$i]->{selected} = not $items[$i]->{selected};
-    list();
-  }
-  else {say STDERR "error: out of range"}
-}
-
-sub help
-{
-  say STDERR qq/Commands:
-  help      .. this
-  list      .. list found videos (> indicates selected)
-  all       .. select all videos
-  none      .. select none
-  revert    .. revert selection
-  (number)  .. toggle (select, unselect) video, see list output
-  dump      .. dump selected video urls to stdout and exit
-  quit      .. terminate program
-Command name abbreviations are allowed, e.g. "a" instead of "all"./;
-}
-
-sub list
-{
-  my $i = 0;
-  foreach (@items)
-  {
-    printf STDERR "%2s%02d: $_->{title}\n", $_->{selected}
-      ? ">"
-      : "",
-      ++$i;
-  }
-}
-
-sub select_all
-{
-  $_->{selected} = 1 foreach @items;
-  list();
-}
-
-sub select_none
-{
-  $_->{selected} = 0 foreach @items;
-  list();
-}
-
-sub revert_selection
-{
-  $_->{selected} = not $_->{selected} foreach @items;
-  list();
+  $p->exec;
 }
 
 __END__
