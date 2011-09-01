@@ -1,4 +1,15 @@
 
+0.2.0  Thu Sep 01 2011  Toni Gundogdu
+Changes:
+    - use Perl 5.10.1+
+    - --max-results and --start-index accept now only integer values
+    - Add --max-results check: use default (50) if value > 50
+    - Implement --all
+        - Return all feed items
+    - use Umph::Prompt with --interactive
+        - Makes several improvements to the (old) prompt
+        - Get it from <http://umph.googlecode.com/> for now
+
 0.1.8  Thu Mar 03 2011  Toni Gundogdu
 Changes:
         - Add man1/umph.1.pod (move POD from bin/umph)
