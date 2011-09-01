@@ -35,7 +35,9 @@ exit main();
 
 sub print_version
 {
-  say "umph version $VERSION
+  eval "require Umph::Prompt";
+  my $p = $@ ? "" : ", Umph::Prompt version $Umph::Prompt::VERSION";
+  say "umph version $VERSION$p
 Copyright (C) 2010-2011  Toni Gundogdu
 This is free software; see the source for copying conditions.  There is NO
 warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.";
