@@ -1,6 +1,7 @@
 
 
 GENERAL
+=======
 
 umph is a command line tool for parsing YouTube feeds. It can parse
 playlists, favorite lists, and user upload lists.
@@ -14,6 +15,7 @@ gitweb: <git://repo.or.cz/w/umph.git>
 
 
 LICENSE
+=======
 
 umph is free software, licensed under the GPLv3+.
 
