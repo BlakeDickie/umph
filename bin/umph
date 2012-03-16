@@ -194,6 +194,7 @@ sub from_arg
   }
   else
   {
+    $arg0 =~ s/^PL//;
     $u = GURL . "/playlists/$arg0?v=2";
   }
 
