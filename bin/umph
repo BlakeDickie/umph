@@ -282,9 +282,9 @@ __END__
 =head1 SYNOPSIS
 
 umph [-q] [-i] [--csv | --json] [--type=E<lt>valueE<gt>]
-     [--proxy=E<lt>addrE<gt> | --no-proxy]
-     [--all | [--start-index=E<lt>valueE<gt>] [--max-results=E<lt>valueE<gt>]
-     [--help] E<lt>playlist_idE<gt> | E<lt>usernameE<gt>
+     [[--all | [--start-index=E<lt>valueE<gt>] [--max-results=E<lt>valueE<gt>]]
+     [--proxy=E<lt>addrE<gt> | --no-proxy] [--help]
+     E<lt>playlist_idE<gt> | E<lt>usernameE<gt>
 
 =head2 OPTIONS
 
