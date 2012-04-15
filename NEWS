@@ -1,3 +1,14 @@
+v0.2.1  (2012-04-15)
+
+Toni Gundogdu:
+  - FIX: Strip playlist prefix "PL" if found (#3) [95966bb]
+  - FIX: Synopsis [9772a58]
+  - Trim --version output [6d3c2d6]
+
+ bin/umph            |   15 +++++++--------
+ doc/man1/umph.1.pod |    7 ++++---
+ 2 files changed, 11 insertions(+), 11 deletions(-)
+
 
 0.2.0  Thu Sep 01 2011  Toni Gundogdu
 Changes:
