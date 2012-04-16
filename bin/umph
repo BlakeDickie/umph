@@ -239,6 +239,7 @@ sub from_arg
   $u .= "?v=2";
   $u .= "&start-index=$s";
   $u .= "&max-results=$m";
+  $u .= "&strict=true"; # Refer to http://is.gd/0msY8X
 }
 
 sub to_item
