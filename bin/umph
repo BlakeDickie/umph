@@ -18,7 +18,7 @@
 #
 
 use 5.010001;
-use feature 'say';
+use feature 'say', 'switch';
 
 use warnings;
 use strict;
@@ -182,22 +182,26 @@ use constant GURL => "http://gdata.youtube.com/feeds/api";
 sub from_arg
 {
   my ($arg0, $s, $m) = @_;
-
   my $u;
-  if ($config{type} eq "u" or $config{type} eq "uploads")
+
+  given ($config{type})
   {
-    $u = GURL . "/users/$arg0/uploads?v=2";
-  }
-  elsif ($config{type} eq "f" or $config{type} eq "favorites")
-  {
-    $u = GURL . "/users/$arg0/favorites?v=2";
-  }
-  else
-  {
-    $arg0 =~ s/^PL//;
-    $u = GURL . "/playlists/$arg0?v=2";
+    when (/^u/)
+    {
+      $u = GURL . "/users/$arg0/uploads";
+    }
+    when (/^f/)
+    {
+      $u = GURL . "/users/$arg0/favorites";
+    }
+    default
+    {
+      $arg0 =~ s/^PL//;
+      $u = GURL . "/playlists/$arg0";
+    }
   }
 
+  $u .= "?v=2";
   $u .= "&start-index=$s";
   $u .= "&max-results=$m";
 }
