@@ -198,7 +198,12 @@ sub from_arg
     {
       $arg0 = $1
         if $arg0 =~ /^http.*list=(\w+)/;    # Grab playlist ID if URL
+
       $arg0 =~ s/^PL//;                     # Strip "PL" prefix if found
+
+      croak "$arg0: does not look like a playlist ID\n"
+        unless length $arg0 >= 16;
+
       $u = GURL . "/playlists/$arg0";
     }
   }
