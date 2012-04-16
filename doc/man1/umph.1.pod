@@ -22,22 +22,20 @@ C<--interactive> prompt.
 
 =head1 OPTIONS
 
-=over 4
-
-=item B<-h, --help>
+=head2 -h, --help
 
 Print help and exit.
 
-=item B<-v, --version>
+=head2 -v, --version
 
 Print version and exit.
 
-=item B<-q, --quiet>
+=head2 -q, --quiet
 
 Turn off output to stderr, e.g. status changes. Warnings and errors are
 still printed.
 
-=item B<-t, --type> I<arg> (=p)
+=head2 -t, --type I<arg> (=p)
 
 Specifies the feed type to get. I<arg> can be one of the following:
 
@@ -47,7 +45,7 @@ Specifies the feed type to get. I<arg> can be one of the following:
 
 See also L</EXAMPLES>.
 
-=item B<-s, --start-index> I<arg> (=1)
+=head2 -s, --start-index I<arg> (=1)
 
 "The start-index parameter specifies the index of the first matching result
 that should be included in the result set. This parameter uses a one-based
@@ -60,7 +58,7 @@ and the max-results parameter to 10." -- E<lt>http://is.gd/l4wDNfE<gt>
 
 C<--all> causes umph to ignore the value set with this option.
 
-=item B<-m, --max-results> I<arg> (=25)
+=head2 -m, --max-results I<arg> (=25)
 
 "The max-results parameter specifies the maximum number of results that
 should be included in the result set.
@@ -76,21 +74,21 @@ max-results parameter to 10." -- E<lt>http://is.gd/OcSjwUE<gt>
 
 C<--all> causes umph to ignore the value set with this option.
 
-=item B<-a, --all>
+=head2 -a, --all
 
-Get all feed items.
+Get the entire feed.
 
-=item B<-i, --interactive>
+=head2 -i, --interactive
 
 Open the interactive prompt which can be used to select the items.
 umph selects I<all> feed items by default. See also L</INTERACTIVE PROMPT>.
 
-=item B<-E, --export-response> I<arg>
+=head2 -E, --export-response I<arg>
 
 Write server error response (XML) to file I<arg> and exit with status 1.
 Normally, the program parses the response and prints it to the stderr.
 
-=item B<-d, --export-format> I<arg>
+=head2 -d, --export-format I<arg>
 
 Set the interchange format in which the data is to be printed.
 Possible values:
@@ -100,33 +98,35 @@ Possible values:
 
 By default, umph prints out each media URL separated by a newline.
 
-=item B<--json> (depr.)
+=head2 --json [depr.]
 
 Print details in JSON. Negates --csv.
 This option is deprecated since 0.2.2, use C<--export-format>, instead.
 
-=item B<--csv> (depr.)
+=head2 --csv [depr.]
 
 Print details in CSV.
 This option is deprecated since 0.2.2, use C<--export-format>, instead.
 
-=item B<--proxy> I<arg>
+=head2 --proxy I<arg>
 
 Use I<arg> for HTTP proxy, e.g. "http://foo:1234". Overrides the http_proxy
 environment setting.
 
-=item B<--no-proxy>
+=head2 --no-proxy
 
-Disable use of HTTP proxy. Overrides both C<--proxy> and http_proxy
+Disable use of HTTP proxy. Overrides both C<--proxy> and B<http_proxy>
 environment settings.
-
-=back
 
 =head1 INTERACTIVE PROMPT
 
-Use the C<--interactive> switch to open the prompt. Note that umph
-uses (as of 0.2.0) the Umph::Prompt module for this. Once the prompt
-opens, type "help" to get a list of commands available to the prompt.
+The interactive prompt may be used to select the feed items. The prompt may be
+useful when the feed contains many items and you wish to limit the
+selection to cover only some of them.
+
+=head2 NOTE
+
+This requires the Umph::Prompt module.
 
 =head1 EXAMPLES
 
@@ -156,9 +156,10 @@ Get favorites for user "foo".
 
 Get uploads for user "foo".
 
-=head2 umph AAF3A1D0CA1E304F | cclive
+=head2 umph -i -a AAF3A1D0CA1E304F | cclive
 
-Download the found items with C<cclive(1)>.
+Parse the entire playlist (-a), select the items using the interactive
+prompt (-i) and download the selection with C<cclive(1)>.
 
 =head1 EXIT STATUS
 
@@ -168,40 +169,37 @@ Exits 0 on success, otherwise 1.
 
 =head2 ~/.umphrc
 
-=head3 Example:
+Many of the options may be set in this file.
 
- echo "--interactive" >> ~/.umphrc
+=head3 Example
+
+echo "--interactive" E<gt> ~/.umphrc
+
+=head1 ENVIRONMENT
+
+=head2 http_proxy
+
+LWP::UserAgent reads the B<http_proxy> setting. See also C<--proxy> and
+C<--no-proxy>.
+
+=head3 Example
+
+env http_proxy=http://foo:1234 umph AAF3A1D0CA1E304F
 
 =head1 NOTES
 
-=over 4
-
-=item B<http_proxy>
-
-umph depends on XML::DOM which uses LWP::UserAgent to fetch the data
-over the network. LWP::UserAgent reads the http_proxy environment
-setting. e.g.:
-
- env http_proxy=http://foo:1234 umph AAF3A1D0CA1E304F
-
-=item B<Unavailable feeds>
+=head2 Unavailable feeds
 
 umph cannot parse "private" lists.
 
-=back
-
 =head1 WWW
 
- Home  : <http://umph.googlecode.com/>
- gitweb: <http://repo.or.cz/w/umph.git>
+ Home  : http://umph.googlecode.com/
+ gitweb: http://repo.or.cz/w/umph.git
 
 =head1 LICENSE
 
 umph is free software, licensed under the GPLv3+.
-
-=head1 SEE ALSO
-
-C<cclive(1)>
 
 =head1 AUTHOR
 
