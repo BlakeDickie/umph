@@ -1,7 +1,7 @@
 #!/usr/bin/perl
 #
-# umph
-# Copyright (C) 2010-2011  Toni Gundogdu <legatvs@cpan.org>
+# umph - Command line tool for parsing YouTube feeds
+# Copyright (C) 2010-2012  Toni Gundogdu <legatvs@cpan.org>
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -51,7 +51,7 @@ sub print_help
 use constant MAX_RESULTS_LIMIT => 50;    # Refer to http://is.gd/OcSjwU
 my %config;
 
-sub check_max_results_value
+sub chk_max_results_value
 {
   if ($config{max_results} > MAX_RESULTS_LIMIT)
   {
@@ -63,12 +63,28 @@ sub check_max_results_value
   }
 }
 
-sub check_umph_prompt
+sub chk_depr_export_format_opts
+{
+  if ($config{json})
+  {
+    say STDERR
+      qq/W: --json is deprecated, use --export-format=json instead/;
+    $config{export_format} = 'json';
+  }
+  if ($config{csv})
+  {
+    say STDERR
+      qq/W: --csv is deprecated, use --export-format=csv instead/;
+    $config{export_format} = 'csv';
+  }
+}
+
+sub chk_umph_prompt
 {
   if ($config{'interactive'} and not eval 'require Umph::Prompt')
   {
     say STDERR
-      qq/WARNING Umph::Prompt not found, ignoring --interactive option/;
+      qq/W: "Umph::Prompt" module not found, ignoring --interactive/;
     $config{interactive} = 0;
   }
 }
@@ -82,6 +98,7 @@ sub init
              'max_results|max-results|m=i',
              'interactive|i',
              'all|a',
+             'export_format|export-format|d=s',
              'json',
              'csv',
              'proxy=s',
@@ -93,12 +110,14 @@ sub init
 
   print_help if scalar @ARGV == 0;
 
-  $config{type}        ||= 'p';    # Default to "playlist".
-  $config{start_index} ||= 1;      # Default to 1.
-  $config{max_results} ||= 25;     # Default 25.
+  $config{export_format} ||= '';
+  $config{type}          ||= 'p';    # Default to "playlist".
+  $config{start_index}   ||= 1;      # Default to 1.
+  $config{max_results}   ||= 25;     # Default 25.
 
-  check_max_results_value;
-  check_umph_prompt;
+  chk_depr_export_format_opts;
+  chk_max_results_value;
+  chk_umph_prompt;
 }
 
 sub spew_qe { print STDERR @_ unless $config{quiet} }
@@ -147,33 +166,42 @@ sub main
 
   open_prompt() if $config{interactive};
 
-  say qq/{\n  "video": [/ if $config{json};
+  say qq/{\n  "video": [/ if $config{export_format} =~ /^j/;
 
   my $i = 0;
 
-  foreach (@items)
+  for my $item (@items)
   {
-    if ($_->{selected} or not $config{interactive})
+    if ($item->{selected} or not $config{interactive})
     {
       ++$i;
 
-      my $t = $_->{title} || "";
+      my $t = $item->{title} || "";
       $t =~ s/"/\\"/g;
 
-      if ($config{json})
+      given ($config{export_format})
       {
-        say "," if $i > 1;
-        say "    {";
-        say qq/      "title": "$t",/;
-        say qq/      "url": "$_->{url}"/;
-        print "    }";
+        when (/^j/)
+        {
+          say "," if $i > 1;
+          say "    {";
+          say qq/      "title": "$t",/;
+          say qq/      "url": "$item->{url}"/;
+          print "    }";
+        }
+        when (/^c/)
+        {
+          say qq/"$t","$item->{url}"/;
+        }
+        default
+        {
+          say "$item->{url}";
+        }
       }
-      elsif ($config{csv}) { say qq/"$t","$_->{url}"/ }
-      else                 { say "$_->{url}" }
     }
   }
 
-  say "\n  ]\n}" if $config{json};
+  say "\n  ]\n}" if $config{export_format} =~ /^j/;
   0;
 }
 
@@ -251,19 +279,16 @@ sub open_prompt
         $p->help(\@a);
       },
       n => sub {
-        $config{json} = 0;
-        $config{csv}  = 0;
+        $config{export_format} = '';
         say STDERR "=> print in default format";
       },
       j => sub {
-        $config{json} = 1;
-        $config{csv}  = 0;
-        say STDERR "=> print in json";
+        $config{export_format} = 'json';
+        say STDERR "=> print in $config{export_format}";
       },
       c => sub {
-        $config{json} = 0;
-        $config{csv}  = 1;
-        say STDERR "=> print in csv";
+        $config{export_format} = 'csv';
+        say STDERR "=> print in $config{export_format}";
       },
     },
 
@@ -292,7 +317,7 @@ __END__
 
 =head1 SYNOPSIS
 
-umph [-q] [-i] [--csv | --json] [--type=E<lt>valueE<gt>]
+umph [-q] [-i] [--export-format=E<lt>valueE<gt>] [--type=E<lt>valueE<gt>]
      [[--all | [--start-index=E<lt>valueE<gt>] [--max-results=E<lt>valueE<gt>]]
      [--proxy=E<lt>addrE<gt> | --no-proxy] [--help]
      E<lt>playlist_idE<gt> | E<lt>usernameE<gt>
@@ -307,8 +332,9 @@ umph [-q] [-i] [--csv | --json] [--type=E<lt>valueE<gt>]
  -s, --start-index arg (=1)     Index of first matching result
  -m, --max-results arg (=25)    Max number of results included
  -a, --all                      Get all items
-     --json                     Print details in JSON
-     --csv                      Print details in CSV
+ -d, --export-format arg        Interchange format to print in
+     --json  [depr.]            Print details in JSON
+     --csv   [depr.]            Print details in CSV
      --proxy arg (=http_proxy)  Use proxy for HTTP connections
      --no-proxy                 Disable use of HTTP proxy
 
