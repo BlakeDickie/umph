@@ -101,7 +101,7 @@ sub init
   check_umph_prompt;
 }
 
-sub spew_qe {print STDERR @_ unless $config{quiet}}
+sub spew_qe { print STDERR @_ unless $config{quiet} }
 
 my @items;
 
@@ -168,8 +168,8 @@ sub main
         say qq/      "url": "$_->{url}"/;
         print "    }";
       }
-      elsif ($config{csv}) {say qq/"$t","$_->{url}"/}
-      else                 {say "$_->{url}"}
+      elsif ($config{csv}) { say qq/"$t","$_->{url}"/ }
+      else                 { say "$_->{url}" }
     }
   }
 
@@ -265,7 +265,7 @@ sub open_prompt
       my ($p, $args) = @_;
       $p->toggle(\@items, $args);
     },
-    onitems  => sub {return \@items},
+    onitems  => sub { return \@items },
     onloaded => sub {
       my ($p, $args) = @_;
       $p->display(\@items, $args);
