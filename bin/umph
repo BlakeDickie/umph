@@ -387,7 +387,7 @@ umph [-q] [-i] [--type=E<lt>valueE<gt>]
  -t, --type arg (=p)            Get feed type
  -s, --start-index arg (=1)     Index of first matching result
  -m, --max-results arg (=25)    Max number of results included
- -a, --all                      Get all items
+ -a, --all                      Get the entire feed
  -E, --export-response arg      Write server error response to file
  -d, --export-format arg        Interchange format to print in
      --json  [depr.]            Print details in JSON
