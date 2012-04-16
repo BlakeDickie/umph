@@ -95,14 +95,28 @@ sub chk_error_resp
 
   my $root = $doc->getDocumentElement;
 
-  for my $e ($root->getElementsByTagName("error"))
+  if ($config{export_response})
   {
-    my $d = to_item($e, "domain")->getFirstChild->getNodeValue;
-    my $c = to_item($e, "code")->getFirstChild->getNodeValue;
-    my $errmsg = "error: $d: $c";
-    chk_error_resp_reason($e, \$errmsg);
-    chk_error_resp_loc($e, \$errmsg);
-    croak "\n$errmsg\n";
+    if ($root->getElementsByTagName("error"))
+    {
+      $doc->printToFile($config{export_response});
+      say STDERR
+        "\nI: Error response written to $config{export_response}";
+      say STDERR "I: Program terminated with status 1";
+      exit 1;
+    }
+  }
+  else
+  {
+    for my $e ($root->getElementsByTagName("error"))
+    {
+      my $d = to_item($e, "domain")->getFirstChild->getNodeValue;
+      my $c = to_item($e, "code")->getFirstChild->getNodeValue;
+      my $errmsg = "error: $d: $c";
+      chk_error_resp_reason($e, \$errmsg);
+      chk_error_resp_loc($e, \$errmsg);
+      croak "\n$errmsg\n";
+    }
   }
 }
 
@@ -141,6 +155,7 @@ sub init
              'csv',
              'proxy=s',
              'no_proxy|no-proxy',
+             'export_response|export-response|E=s',
              'quiet|q',
              'version' => \&print_version,
              'help'    => \&print_help,
@@ -357,7 +372,8 @@ __END__
 
 =head1 SYNOPSIS
 
-umph [-q] [-i] [--export-format=E<lt>valueE<gt>] [--type=E<lt>valueE<gt>]
+umph [-q] [-i] [--type=E<lt>valueE<gt>]
+     [--export-response=E<lt>valueE<gt>] [--export-format=E<lt>valueE<gt>]
      [[--all | [--start-index=E<lt>valueE<gt>] [--max-results=E<lt>valueE<gt>]]
      [--proxy=E<lt>addrE<gt> | --no-proxy] [--help]
      E<lt>playlist_idE<gt> | E<lt>usernameE<gt>
@@ -372,6 +388,7 @@ umph [-q] [-i] [--export-format=E<lt>valueE<gt>] [--type=E<lt>valueE<gt>]
  -s, --start-index arg (=1)     Index of first matching result
  -m, --max-results arg (=25)    Max number of results included
  -a, --all                      Get all items
+ -E, --export-response arg      Write server error response to file
  -d, --export-format arg        Interchange format to print in
      --json  [depr.]            Print details in JSON
      --csv   [depr.]            Print details in CSV

@@ -5,7 +5,8 @@ umph - Command line tool for parsing YouTube feeds
 
 =head1 SYNOPSIS
 
-umph [-q] [-i] [--export-format=E<lt>valueE<gt>] [--type=E<lt>valueE<gt>]
+umph [-q] [-i] [--type=E<lt>valueE<gt>]
+     [--export-response=E<lt>valueE<gt>] [--export-format=E<lt>valueE<gt>]
      [[--all | [--start-index=E<lt>valueE<gt>] [--max-results=E<lt>valueE<gt>]]
      [--proxy=E<lt>addrE<gt> | --no-proxy] [--help]
      E<lt>playlist_idE<gt> | E<lt>usernameE<gt>
@@ -83,6 +84,11 @@ Get all feed items.
 
 Open the interactive prompt which can be used to select the items.
 umph selects I<all> feed items by default. See also L</INTERACTIVE PROMPT>.
+
+=item B<-E, --export-response> I<arg>
+
+Write server error response (XML) to file I<arg> and exit with status 1.
+Normally, the program parses the response and prints it to the stderr.
 
 =item B<-d, --export-format> I<arg>
 
