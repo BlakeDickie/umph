@@ -89,6 +89,44 @@ sub chk_umph_prompt
   }
 }
 
+sub chk_error_resp
+{
+  my ($doc) = @_;
+
+  my $root = $doc->getDocumentElement;
+
+  for my $e ($root->getElementsByTagName("error"))
+  {
+    my $d = to_item($e, "domain")->getFirstChild->getNodeValue;
+    my $c = to_item($e, "code")->getFirstChild->getNodeValue;
+    my $errmsg = "error: $d: $c";
+    chk_error_resp_reason($e, \$errmsg);
+    chk_error_resp_loc($e, \$errmsg);
+    croak "\n$errmsg\n";
+  }
+}
+
+sub chk_error_resp_loc
+{
+  my ($e, $errmsg) = @_;
+
+  my $l = to_item($e, "location");
+  return unless $l;
+
+  my $t = $l->getAttributeNode("type")->getValue;
+  $$errmsg .= ": " . $l->getFirstChild->getNodeValue . " [type=$t]";
+}
+
+sub chk_error_resp_reason
+{
+  my ($e, $errmsg) = @_;
+
+  my $r = to_item($e, "internalReason");
+  return unless $r;
+
+  $$errmsg .= ": " . $r->getFirstChild->getNodeValue;
+}
+
 sub init
 {
   GetOptions(
@@ -145,6 +183,9 @@ sub main
     my $doc  = $p->parsefile(from_arg($ARGV[0], $s, $m));
     my $root = $doc->getDocumentElement;
     my $n    = 0;
+
+    chk_error_resp($doc);
+
     for my $entry ($root->getElementsByTagName("entry"))
     {
       my $t = to_item($entry, "title")->getFirstChild->getNodeValue;
@@ -159,9 +200,7 @@ sub main
 
     last if $n == 0 or not $config{all};
   }
-
   spew_qe "done.\n";
-
   croak "error: nothing found\n" if scalar @items == 0;
 
   open_prompt() if $config{interactive};
@@ -239,7 +278,7 @@ sub from_arg
   $u .= "?v=2";
   $u .= "&start-index=$s";
   $u .= "&max-results=$m";
-  $u .= "&strict=true"; # Refer to http://is.gd/0msY8X
+  $u .= "&strict=true";      # Refer to http://is.gd/0msY8X
 }
 
 sub to_item
