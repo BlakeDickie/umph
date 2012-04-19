@@ -132,34 +132,32 @@ This requires the Umph::Prompt module.
 
 =head2 umph AAF3A1D0CA1E304F
 
-Get playlist "AAF3A1D0CA1E304F".
-
-=head2 umph --json AAF3A1D0CA1E304F
-
-Same as above, but print the details in JSON.
+Get the playlist "AAF3A1D0CA1E304F".
 
 =head2 umph -s 11 -m 10 AAF3A1D0CA1E304F
 
-Same as above but get the items 11-20 from the playlist.
+Like above but get the items 11-20 from the playlist.
 
 =head2 umph -a AAF3A1D0CA1E304F
 
-Similar but get I<all> of the items in the playlist. By default, umph gets
-only the items 1-25 from the list. See also C<--start-index> and
-C<--max-results>.
+Get the entire playlist. By default, umph gets only the items 1-25.
+See also C<--start-index> and C<--max-results>.
 
 =head2 umph -t f foo
 
-Get favorites for user "foo".
+Get the favorites for user "foo".
 
 =head2 umph -t u foo
 
-Get uploads for user "foo".
+Get the uploads for user "foo".
 
-=head2 umph -i -a AAF3A1D0CA1E304F | cclive
+=head2 umph AAF3A1D0CA1E304F | cclive
 
-Parse the entire playlist (-a), select the items using the interactive
-prompt (-i) and download the selection with C<cclive(1)>.
+Download the playlist items using C<cclive(1)>.
+
+=head2 umph -i AAF3A1D0CA1E304F | cclive
+
+Same but choose which of the videos to download.
 
 =head1 EXIT STATUS
 
