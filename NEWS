@@ -1,3 +1,18 @@
+v0.2.2  (2012-04-23)
+
+Toni Gundogdu:
+  - Accept URLs with playlist ID param [82f3060]
+  - Add --export-format, depr. --json, --csv [f90195d]
+  - Add --export-response [9e288fe]
+  - Use YouTube API returned error message [a7b95f6]
+
+ MANIFEST.SKIP       |    1 -
+ bin/umph            |  204 +++++++++++++++++++++++++++++++------------
+ doc/man1/umph.1.pod |  124 +++++++++++++++------------
+ style/perltidyrc    |   10 --
+ 4 files changed, 218 insertions(+), 121 deletions(-)
+
+
 v0.2.1  (2012-04-15)
 
 Toni Gundogdu:
