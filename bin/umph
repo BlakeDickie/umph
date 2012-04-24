@@ -216,7 +216,7 @@ sub main
       }
       croak qq/"link" not found/ unless $u;
 
-      push @items, {title => $t, url => $u, selected => 1};
+      push_unique_only($t, $u);
 
       spew_qe((++$n % 5 == 0) ? " " : ".");
     }
@@ -311,6 +311,20 @@ sub tag0
 {
   my ($e, $t) = @_;
   $e->getElementsByTagName($t)->item(0);
+}
+
+sub push_unique_only
+{
+  my ($t, $u) = @_;
+  my $q = qr|v=([\w\-_]+)|;
+
+  for my $i (@items)
+  {
+    my $a = $1 if $i->{url} =~ /$q/;
+    my $b = $1 if $u =~ /$q/;
+    return if $a eq $b;
+  }
+  push @items, {title => $t, url => $u, selected => 1};
 }
 
 sub open_prompt
