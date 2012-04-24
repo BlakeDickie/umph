@@ -110,8 +110,8 @@ sub chk_error_resp
   {
     for my $e ($root->getElementsByTagName("error"))
     {
-      my $d = to_item($e, "domain")->getFirstChild->getNodeValue;
-      my $c = to_item($e, "code")->getFirstChild->getNodeValue;
+      my $d = tag0($e, "domain")->getFirstChild->getNodeValue;
+      my $c = tag0($e, "code")->getFirstChild->getNodeValue;
       my $errmsg = "error: $d: $c";
       chk_error_resp_reason($e, \$errmsg);
       chk_error_resp_loc($e, \$errmsg);
@@ -124,7 +124,7 @@ sub chk_error_resp_loc
 {
   my ($e, $errmsg) = @_;
 
-  my $l = to_item($e, "location");
+  my $l = tag0($e, "location");
   return unless $l;
 
   my $t = $l->getAttributeNode("type")->getValue;
@@ -135,7 +135,7 @@ sub chk_error_resp_reason
 {
   my ($e, $errmsg) = @_;
 
-  my $r = to_item($e, "internalReason");
+  my $r = tag0($e, "internalReason");
   return unless $r;
 
   $$errmsg .= ": " . $r->getFirstChild->getNodeValue;
@@ -195,25 +195,35 @@ sub main
 
   while (1)
   {
-    my $doc  = $p->parsefile(from_arg($ARGV[0], $s, $m));
-    my $root = $doc->getDocumentElement;
-    my $n    = 0;
+    my $d = $p->parsefile(to_url($ARGV[0], $s, $m));
+    my $r = $d->getDocumentElement;
+    my $n = 0;
 
-    chk_error_resp($doc);
+    chk_error_resp($d);
 
-    for my $entry ($root->getElementsByTagName("entry"))
+    for my $e ($r->getElementsByTagName("entry"))
     {
-      my $t = to_item($entry, "title")->getFirstChild->getNodeValue;
-      my $l =
-        to_item($entry, "link")->getAttributeNode("href")->getValue;
-      my %data = (title => $t, url => $l, selected => 1);
-      push @items, \%data;
+      my $t = tag0($e, "title")->getFirstChild->getNodeValue;
+
+      my $u;
+      for my $l ($e->getElementsByTagName("link"))
+      {
+        if ($l->getAttributeNode("rel")->getValue eq "alternate")
+        {
+          $u = $l->getAttributeNode("href")->getValue;
+          last;
+        }
+      }
+      croak qq/"link" not found/ unless $u;
+
+      push @items, {title => $t, url => $u, selected => 1};
+
       spew_qe((++$n % 5 == 0) ? " " : ".");
-      ++$s;
     }
-    $doc->dispose;
+    $d->dispose;
 
     last if $n == 0 or not $config{all};
+    $s += $n;
   }
   spew_qe "done.\n";
   croak "error: nothing found\n" if scalar @items == 0;
@@ -261,7 +271,7 @@ sub main
 
 use constant GURL => "http://gdata.youtube.com/feeds/api";
 
-sub from_arg
+sub to_url
 {
   my ($arg0, $s, $m) = @_;
   my $u;
@@ -297,10 +307,10 @@ sub from_arg
   $u .= "&strict=true";      # Refer to http://is.gd/0msY8X
 }
 
-sub to_item
+sub tag0
 {
-  my ($entry, $name) = @_;
-  $entry->getElementsByTagName($name)->item(0);
+  my ($e, $t) = @_;
+  $e->getElementsByTagName($t)->item(0);
 }
 
 sub open_prompt
