@@ -190,6 +190,10 @@ env http_proxy=http://foo:1234 umph AAF3A1D0CA1E304F
 
 umph cannot parse "private" lists.
 
+=head2 "Play all" playlists
+
+umph cannot currently handle these.
+
 =head1 WWW
 
  Home  : http://umph.googlecode.com/
