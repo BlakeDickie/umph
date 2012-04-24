@@ -1,3 +1,16 @@
+v0.2.3  (2012-04-24)
+
+Toni Gundogdu:
+  - DOC: Add note about "Play all" playlists [54dbe5c]
+  - Do not include duplicate media URLs [fc562cc]
+  - FIX: Parse media URL properly [09723d3]
+  - FIX: Strip playlist prefix properly [f206aad]
+
+ bin/umph            |   73 +++++++++++++++++++++++++++++--------------
+ doc/man1/umph.1.pod |    4 ++
+ 2 files changed, 53 insertions(+), 24 deletions(-)
+
+
 v0.2.2  (2012-04-23)
 
 Toni Gundogdu:
