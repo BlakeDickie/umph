@@ -153,6 +153,7 @@ sub init
              'export_format|export-format|d=s',
              'json',
              'csv',
+             'user_agent|user-agent|g=s',
              'proxy=s',
              'no_proxy|no-proxy',
              'export_response|export-response|E=s',
@@ -163,10 +164,12 @@ sub init
 
   print_help if scalar @ARGV == 0;
 
+  # Set defaults.
+  $config{user_agent}    ||= 'Mozilla/5.0';
   $config{export_format} ||= '';
-  $config{type}          ||= 'p';    # Default to "playlist".
-  $config{start_index}   ||= 1;      # Default to 1.
-  $config{max_results}   ||= 25;     # Default 25.
+  $config{type}          ||= 'p';    # "playlist".
+  $config{start_index}   ||= 1;
+  $config{max_results}   ||= 25;
 
   chk_depr_export_format_opts;
   chk_max_results_value;
@@ -187,6 +190,7 @@ sub main
   $a->env_proxy;    # http://search.cpan.org/perldoc?LWP::UserAgent
   $a->proxy('http', $config{proxy}) if $config{proxy};
   $a->no_proxy('') if $config{no_proxy};
+  $a->agent($config{user_agent});
 
   require XML::DOM;
   my $p = new XML::DOM::Parser(LWP_UserAgent => $a);
@@ -400,25 +404,26 @@ __END__
 umph [-q] [-i] [--type=E<lt>valueE<gt>]
      [--export-response=E<lt>valueE<gt>] [--export-format=E<lt>valueE<gt>]
      [[--all | [--start-index=E<lt>valueE<gt>] [--max-results=E<lt>valueE<gt>]]
-     [--proxy=E<lt>addrE<gt> | --no-proxy] [--help]
-     E<lt>playlist_idE<gt> | E<lt>usernameE<gt>
+     [--proxy=E<lt>addrE<gt> | --no-proxy] [--user-agent=E<lt>valueE<gt>]
+     [--help]  E<lt>playlist_idE<gt> | E<lt>usernameE<gt>
 
 =head2 OPTIONS
 
-     --help                     Print help and exit
-     --version                  Print version and exit
- -q, --quiet                    Be quiet
- -i, --interactive              Run in interactive mode
- -t, --type arg (=p)            Get feed type
- -s, --start-index arg (=1)     Index of first matching result
- -m, --max-results arg (=25)    Max number of results included
- -a, --all                      Get the entire feed
- -E, --export-response arg      Write server error response to file
- -d, --export-format arg        Interchange format to print in
-     --json  [depr.]            Print details in JSON
-     --csv   [depr.]            Print details in CSV
-     --proxy arg (=http_proxy)  Use proxy for HTTP connections
-     --no-proxy                 Disable use of HTTP proxy
+     --help                           Print help and exit
+     --version                        Print version and exit
+ -q, --quiet                          Be quiet
+ -i, --interactive                    Run in interactive mode
+ -t, --type arg (=p)                  Get feed type
+ -s, --start-index arg (=1)           Index of first matching result
+ -m, --max-results arg (=25)          Max number of results included
+ -a, --all                            Get the entire feed
+ -E, --export-response arg            Write server error response to file
+ -d, --export-format arg              Interchange format to print in
+     --json  [depr.]                  Print details in JSON
+     --csv   [depr.]                  Print details in CSV
+ -g, --user-agent arg (=Mozilla/5.0)  Set the HTTP user-agent
+     --proxy arg (=http_proxy)        Use proxy for HTTP connections
+     --no-proxy                       Disable use of HTTP proxy
 
 =cut
 
