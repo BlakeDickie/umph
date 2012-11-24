@@ -296,7 +296,7 @@ sub to_url
         if $arg0 =~ /^http.*list=(\w+)/;
 
       croak "$arg0: does not look like a playlist ID\n"
-        unless length $arg0 == 16;
+        if length $arg0 < 16;
 
       $u = GURL . "/playlists/$arg0";
     }
