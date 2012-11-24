@@ -295,9 +295,6 @@ sub to_url
       $arg0 = $1    # Grab playlist ID if URL
         if $arg0 =~ /^http.*list=(\w+)/;
 
-      $arg0 =~ s/^\w//    # Strip playlist prefix (e.g. "PL")
-        while length $arg0 > 16;
-
       croak "$arg0: does not look like a playlist ID\n"
         unless length $arg0 == 16;
 
