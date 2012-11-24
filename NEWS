@@ -1,3 +1,13 @@
+v0.2.4  (2012-11-24)
+
+Toni Gundogdu:
+  - Add --user-agent option [23f8926]
+  - FIX: Do not strip playlist prefix [a8f81cd]
+  - FIX: Playlist ID length check [322d270]
+
+ 2 files changed, 33 insertions(+), 26 deletions(-)
+
+
 v0.2.3  (2012-04-24)
 
 Toni Gundogdu:
