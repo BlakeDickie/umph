@@ -8,8 +8,8 @@ umph - Command line tool for parsing YouTube feeds
 umph [-q] [-i] [--type=E<lt>valueE<gt>]
      [--export-response=E<lt>valueE<gt>] [--export-format=E<lt>valueE<gt>]
      [[--all | [--start-index=E<lt>valueE<gt>] [--max-results=E<lt>valueE<gt>]]
-     [--proxy=E<lt>addrE<gt> | --no-proxy] [--help]
-     E<lt>playlist_idE<gt> | E<lt>usernameE<gt>
+     [--proxy=E<lt>addrE<gt> | --no-proxy] [--user-agent=E<lt>valueE<gt>]
+     [--help]  E<lt>playlist_idE<gt> | E<lt>usernameE<gt>
 
 =head1 DESCRIPTION
 
@@ -107,6 +107,11 @@ This option is deprecated since 0.2.2, use C<--export-format>, instead.
 
 Print details in CSV.
 This option is deprecated since 0.2.2, use C<--export-format>, instead.
+
+=head2 --user-agent, -g I<arg>
+
+Set the user-agent string to send to the HTTP server. The default value
+is 'Mozilla/5.0'.
 
 =head2 --proxy I<arg>
 
