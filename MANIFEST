@@ -9,3 +9,4 @@ NEWS
 README
 INSTALL
 t/pod.t
+t/playlist.t
