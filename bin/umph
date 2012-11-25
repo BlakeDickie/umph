@@ -293,7 +293,7 @@ sub to_url
     default
     {
       $arg0 = $1    # Grab playlist ID if URL
-        if $arg0 =~ /^http.*list=(\w+)/;
+        if $arg0 =~ /^http.*list=([\w_-]+)/;
 
       croak "$arg0: does not look like a playlist ID\n"
         if length $arg0 < 16;
