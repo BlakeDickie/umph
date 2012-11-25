@@ -170,13 +170,24 @@ Exits 0 on success, otherwise 1.
 
 =head1 FILES
 
-=head2 ~/.umphrc
+=head2 ~/.umphrc - configuration file
 
-Many of the options may be set in this file.
+Most of the options may be defined in the configuration file.
+
+=head3 Note
+
+umph uses Getopt::ArgvFile Perl module to read the configuration file.
+The module I<interpolates> the options from the configuration file.
+Getopt::ArgvFile is described at:
+  http://search.cpan.org/perldoc?Getopt::ArgvFile
 
 =head3 Example
 
-echo "--interactive" E<gt> ~/.umphrc
+  $ cat ~/.umphrc
+  --user-agent=foo/1.0
+  --export-format=json
+  --interactive
+  --all
 
 =head1 ENVIRONMENT
 
@@ -187,7 +198,7 @@ C<--no-proxy>.
 
 =head3 Example
 
-env http_proxy=http://foo:1234 umph AAF3A1D0CA1E304F
+  $ env http_proxy=http://foo:1234 umph AAF3A1D0CA1E304F
 
 =head1 NOTES
 
