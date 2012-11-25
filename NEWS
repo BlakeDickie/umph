@@ -1,3 +1,17 @@
+v0.2.5  (2012-11-25)
+
+Toni Gundogdu:
+  - FIX: playlist ID pattern [d25d7f2]
+  - Manual: Revise FILES section [062d7db]
+  test suite:
+  - Add favorites.t [32297af]
+  - Add playlist.t [1a4737d]
+  - Add uploads.t [e2ff823]
+  - Rename umph-Pod.t [6de116d]
+
+ 8 files changed, 208 insertions(+), 17 deletions(-)
+
+
 v0.2.4  (2012-11-24)
 
 Toni Gundogdu:
