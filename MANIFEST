@@ -8,5 +8,6 @@ doc/man1/umph.1.pod
 NEWS
 README
 INSTALL
-t/pod.t
 t/playlist.t
+t/pod.t
+t/uploads.t
