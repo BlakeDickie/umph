@@ -8,4 +8,4 @@ doc/man1/umph.1.pod
 NEWS
 README
 INSTALL
-t/umph-Pod.t
+t/pod.t
