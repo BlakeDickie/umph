@@ -158,6 +158,7 @@ sub init
              'no_proxy|no-proxy',
              'export_response|export-response|E=s',
              'quiet|q',
+             'playlist_title|playlist-title|T',
              'version' => \&print_version,
              'help'    => \&print_help,
             ) or exit 1;
@@ -179,6 +180,7 @@ sub init
 sub spew_qe { print STDERR @_ unless $config{quiet} }
 
 my @items;
+my $title;
 
 sub main
 {
@@ -204,6 +206,8 @@ sub main
     my $n = 0;
 
     chk_error_resp($d);
+    
+    $title = tag0($r, "title")->getFirstChild->getNodeValue;
 
     for my $e ($r->getElementsByTagName("entry"))
     {
@@ -234,7 +238,15 @@ sub main
 
   open_prompt() if $config{interactive};
 
-  say qq/{\n  "video": [/ if $config{export_format} =~ /^j/;
+  if ($config{export_format} =~ /^j/)
+  {
+  	  say qq/{/;
+  	  if ($config{playlist_title})
+  	  {
+		  say qq/  "title": "$title",/;
+  	  }
+  	  say qq/  "video": [/;
+  }
 
   my $i = 0;
 
@@ -413,6 +425,7 @@ umph [-q] [-i] [--type=E<lt>valueE<gt>]
  -t, --type arg (=p)                  Get feed type
  -s, --start-index arg (=1)           Index of first matching result
  -m, --max-results arg (=25)          Max number of results included
+ -T, --playlist-title                 Export the playlist title.  JSON format only.
  -a, --all                            Get the entire feed
  -E, --export-response arg            Write server error response to file
  -d, --export-format arg              Interchange format to print in
